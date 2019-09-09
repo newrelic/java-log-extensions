@@ -1,0 +1,12 @@
+logging:
+  level: DEBUG
+  appenders:
+    - type: newrelic-file
+      layout:
+        type: newrelic-json
+      archive: false
+      currentLogFilename: ./logs/my-app.log
+    - type: newrelic-console
+      logFormat: "%date{ISO8601} %c %-5p: %m trace.id=%mdc{trace.id} span.id=%mdc{span.id}%n"
+      layout:
+        type: log-format

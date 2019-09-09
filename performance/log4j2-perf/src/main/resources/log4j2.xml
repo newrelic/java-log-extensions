@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config"
+               status="WARN"
+               packages="com.newrelic.logging.log4j2">
+    <Appenders>
+        <File name="NoPluginLogging" fileName="logs/no_plugin-log4j2.log" append="false">
+        </File>
+        <File name="NewRelicPluginLogging" fileName="logs/newrelic-plugin-log4j2.log" append="false">
+            <NewRelicLayout />
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="off">
+        </Root>
+        <Logger name="no_plugin_logging" level="trace">
+            <AppenderRef ref="NoPluginLogging"/>
+        </Logger>
+        <Logger name="newrelic_plugin_logging" level="trace">
+            <AppenderRef ref="NewRelicPluginLogging"/>
+        </Logger>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration debug="false">
+    <appender name="TypicalFile" class="org.apache.log4j.FileAppender">
+        <param name="file" value="logs/log4j1-app.log"/>
+        <param name="append" value="false"/>
+        <layout class="com.newrelic.logging.log4j1.NewRelicLayout"/>
+    </appender>
+
+    <appender name="NewRelicFile" class="com.newrelic.logging.log4j1.NewRelicAsyncAppender">
+        <appender-ref ref="TypicalFile" />
+    </appender>
+
+    <appender name="TypicalConsole" class="org.apache.log4j.ConsoleAppender">
+        <layout class="com.newrelic.logging.log4j1.NewRelicLayout"/>
+    </appender>
+
+    <appender name="NewRelicConsole" class="com.newrelic.logging.log4j1.NewRelicAsyncAppender">
+        <appender-ref ref="TypicalConsole" />
+    </appender>
+
+    <root>
+        <appender-ref ref="NewRelicFile" />
+        <appender-ref ref="NewRelicConsole" />
+    </root>
+
+</log4j:configuration>

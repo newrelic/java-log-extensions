@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019. New Relic Corporation. All rights reserved.
+  ~ SPDX-License-Identifier: Apache-2.0
+  -->
+<FindBugsFilter xmlns="https://github.com/spotbugs/filter/3.0.0"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+    <Match>
+        <!--
+          We have to write to a static because otherwise we don't have a way of intercepting
+          the construction of the target handler or getting a reference to the instance after
+          construction (it's private in the base class).    
+        -->
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="com.newrelic.logging.jul.ListHandler"/>
+    </Match>
+</FindBugsFilter>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config"
+               status="warn"
+               packages="com.newrelic.logging.log4j2">
+    <Appenders>
+        <File name="MyFile" fileName="logs/log4j2.log" append="false">
+            <NewRelicLayout/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="MyFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
