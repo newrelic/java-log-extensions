@@ -6,12 +6,12 @@ repositories {
 }
 
 subprojects {
-    tasks.withType(Test::class).all {
+    tasks.withType<Test>().all {
         useJUnitPlatform()
-        reports.html.isEnabled = true
+        reports.junitXml.isEnabled = true
     }
 
-    tasks.withType(Javadoc::class).all {
+    tasks.withType<Javadoc>().all {
         enabled = false
     }
 
