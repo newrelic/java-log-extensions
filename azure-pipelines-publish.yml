@@ -1,5 +1,5 @@
 # Azure Pipeline that publishes to maven central on every master merge.
-name: Upload to Maven Central Sonatype
+name: Publish - Java Log Extensions
 trigger:
 - master
 pr: none
