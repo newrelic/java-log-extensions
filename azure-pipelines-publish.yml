@@ -34,7 +34,7 @@ steps:
   inputs:
     workingDirectory: ''
     gradleWrapperFile: 'gradlew'
-    options: "-Psigning.secretKeyRingFile=$(secring.secureFilePath)"
+    options: "-Psigning.secretKeyRingFile=$(secring.secureFilePath) -PreleaseVersion=$(releaseVersion)"
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
