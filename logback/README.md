@@ -13,25 +13,8 @@ Logback Extension. All steps are required.
 
 ### 1. Include the dependency in your project.
 
-Gradle:
+Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:logback) for the appropriate snippets.
 
-```groovy
-dependencies {
-    compile("com.newrelic.logging:logback:1.0-rc1")
-}
-```
-
-Maven:
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>com.newrelic.logging</groupId>
-        <artifactId>logback</artifactId>
-        <version>1.0-rc1</version>
-    </dependency>  
-</dependencies>
-```
 
 ### 2. Configure an `<appender>` element with a `NewRelicEncoder`.
 
@@ -61,3 +44,14 @@ you updated in the previous step.
 
 *Why?* The New Relic log format includes New Relic-specific data that must be captured on the thread the log message
 is coming from. This appender captures that information before passing to the standard `AsyncAppender` logic.
+
+### 4. The Async Appender must be referenced by all loggers
+
+Update your logging configuration xml to connect the root (and other) loggers to the `ASYNC` appender you configured
+in the previous step.
+
+```xml
+   <root level="INFO">
+       <appender-ref ref="ASYNC" />
+   </root>
+```
