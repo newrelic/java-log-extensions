@@ -13,25 +13,7 @@ There are some changes to your application to use the New Relic
 
 ### 1. Include the extension in your project.
 
-Gradle:
-
-```groovy
-dependencies {
-    compile("com.newrelic.logging:jul:1.0-rc1")
-}
-```
-
-Maven:
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>com.newrelic.logging</groupId>
-        <artifactId>jul</artifactId>
-        <version>1.0-rc1</version>
-    </dependency>  
-</dependencies>
-```
+Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:jul) for the appropriate snippets.
 
 ### 2. Use the `NewRelicMemoryHandler` to intercept messages destined for another handler.
 
