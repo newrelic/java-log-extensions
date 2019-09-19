@@ -1,7 +1,11 @@
 # New Relic logging extensions
 
 The New Relic logging plugins are extensions for common Java logging frameworks. They are designed to capture app, 
-transaction trace, and span information as part of your application log messages. We support:
+transaction trace, and span information as part of your application log messages. 
+
+For the latest information, please see [the New Relic docs](https://docs.newrelic.com/docs/logs/new-relic-logs/enable-logs-context/enable-logs-context-java).
+
+We support:
 
 * [java.util.logging](jul/README.md)
 * [Apache Log4j 2.x](log4j2/README.md)
