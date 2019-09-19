@@ -12,56 +12,18 @@ There are some changes to your application to use the New Relic Dropwizard Loggi
 
 ### 1. Include the dependency in your project.
 
-Gradle:
+Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:dropwizard) for the appropriate snippets.
 
-```groovy
-dependencies {
-    compile("com.newrelic:logging:dropwizard:1.0-rc1")
-}
-```
-
-Maven:
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>com.newrelic.logging</groupId>
-        <artifactId>dropwizard</artifactId>
-        <version>1.0-rc1</version>
-    </dependency>  
-</dependencies>
-```
-
-### 2. Add services to `src/main/resources/META-INF/services`.
-
-Create the following two files in the `src/main/resources/META-INF/services` directory. If either file already exists, 
-append the contents below into the existing file.
-
-#### File Name: `io.dropwizard.logging.AppenderFactory`
-```
-com.newrelic.logging.dropwizard.NewRelicConsoleAppenderFactory
-com.newrelic.logging.dropwizard.NewRelicFileAppenderFactory
-```
-
-#### File Name: `io.dropwizard.logging.layout.DiscoverableLayoutFactory`
-```
-com.newrelic.logging.dropwizard.NewRelicJsonLayoutFactory
-com.newrelic.logging.dropwizard.LogFormatLayoutFactory
-```
-
-*Why?* These files are configuration for a [ServiceLoader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html)
-used by Dropwizard; it's how Dropwizard finds the layout and appenders used in the next step.
-
-### 3. Use the `newrelic-console` or `newrelic-file` appender with a `newrelic-json` layout.
+### 2. Use the `newrelic-console` or `newrelic-file` appender with a `newrelic-json` layout.
 
 Update your DW configuration yaml like the example below. Modify the appender you have chosen to receive decorated logs.
 
 If you were using `type: console`, then replace that with `type: newrelic-console`. This is a frequent use case for container-based applications. All
-[configuration elements for `type: console`](https://www.dropwizard.io/1.3.13/docs/manual/configuration.html#console)
+[configuration elements for `type: console`](https://dropwizard.readthedocs.io/en/release-1.3.x/manual/configuration.html#console)
 will still apply.
 
 If you were using `type: file` then replace that with `type: newrelic-file`. All 
-[configuration elements for `type: file`](https://www.dropwizard.io/1.3.13/docs/manual/configuration.html#file) 
+[configuration elements for `type: file`](https://dropwizard.readthedocs.io/en/release-1.3.x/manual/configuration.html#file) 
 will still apply.
 
 ```yaml

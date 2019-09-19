@@ -13,25 +13,8 @@ log4j 2.x Extension. All steps are required.
 
 ### 1. Include the dependency in your project.
 
-Gradle:
+Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:log4j2) for the appropriate snippets.
 
-```groovy
-dependencies {
-    compile("com.newrelic.logging:log4j2:1.0-rc1")
-}
-```
-
-Maven:
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>com.newrelic.logging</groupId>
-        <artifactId>log4j2</artifactId>
-        <version>1.0-rc1</version>
-    </dependency>  
-</dependencies>
-```
 
 ### 2. Add `packages="com.newrelic.logging.log4j2"` to the `Configuration` element.
 

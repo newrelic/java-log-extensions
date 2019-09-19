@@ -14,25 +14,8 @@ log4j 1.x Extension. All steps are required.
 
 ### 1. Include the dependency in your project.
 
-Gradle:
+Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:log4j1) for the appropriate snippets.
 
-```groovy
-dependencies {
-    compile("com.newrelic.logging:log4j1:1.0-rc1")
-}
-```
-
-Maven:
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>com.newrelic.logging</groupId>
-        <artifactId>log4j1</artifactId>
-        <version>1.0-rc1</version>
-    </dependency>  
-</dependencies>
-```
 
 ### 2. Configure an `<appender>` element with a `NewRelicLayout`.
 
