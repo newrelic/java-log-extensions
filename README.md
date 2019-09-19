@@ -5,6 +5,8 @@ transaction trace, and span information as part of your application log messages
 
 For the latest information, please see [the New Relic docs](https://docs.newrelic.com/docs/logs/new-relic-logs/enable-logs-context/enable-logs-context-java).
 
+We welcome your [Contributions](CONTRIBUTING.md)!
+
 We support:
 
 * [java.util.logging](jul/README.md)
