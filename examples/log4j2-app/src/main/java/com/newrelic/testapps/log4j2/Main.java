@@ -10,6 +10,7 @@ import com.newrelic.api.agent.Trace;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.LocalizedMessage;
+import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.util.Supplier;
 
 import java.util.Arrays;
@@ -64,7 +65,10 @@ public class Main {
         logger.error(message);
         NewRelic.noticeError(new RuntimeException("Whoops!"));
         logger.error("This is a secondary error in the same span as the error message");
-        logger.error(() -> new LocalizedMessage(bundle, "MSI123", "inserts (but no NR data!)"));
+
+        // this cast only exists because log4j 2.8 has a deprecated MessageSupplier overload.
+        // Lambda type inference was going to MessageSupplier, not Supplier.
+        logger.error((Supplier<Message>)() -> new LocalizedMessage(bundle, "MSI123", "inserts (but no NR data!)"));
     }
 
     @Trace(dispatcher = true)
