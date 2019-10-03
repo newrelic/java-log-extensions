@@ -1,8 +1,5 @@
 # Azure Pipeline that publishes to maven central on every master merge.
 name: Publish - Java Log Extensions
-trigger:
-- master
-pr: none
 
 pool:
   vmImage: 'ubuntu-latest'
