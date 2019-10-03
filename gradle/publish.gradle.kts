@@ -37,9 +37,12 @@ configure<PublishingExtension> {
             val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
             val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+
             configure<SigningExtension> {
+                setRequired({ gradle.taskGraph.hasTask("uploadArchives") })
                 sign(publications["mavenJava"])
             }
+
             credentials {
                 username = project.properties["sonatypeUsername"] as String?
                 password = project.properties["sonatypePassword"] as String?
