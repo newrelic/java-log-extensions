@@ -19,14 +19,16 @@ import java.util.function.Supplier;
  * instead of {@link ParameterizedMessage} or {@link org.apache.logging.log4j.message.Message} directly.
  */
 public class NewRelicMessage extends ParameterizedMessage {
-    private final Map<String, String> traceData = agentSupplier.get().getLinkingMetadata();
+    private final Map<String, String> traceData;
 
     public NewRelicMessage(String messagePattern, Object[] arguments, Throwable throwable) {
         super(messagePattern, arguments, throwable);
+        traceData = agentSupplier.get().getLinkingMetadata();
     }
 
     public NewRelicMessage(String messagePattern, Object... arguments) {
         super(messagePattern, arguments);
+        traceData = agentSupplier.get().getLinkingMetadata();
     }
 
     Map<String, String> getTraceData() {
@@ -43,7 +45,7 @@ public class NewRelicMessage extends ParameterizedMessage {
             return false;
         }
 
-        NewRelicMessage other = (NewRelicMessage)o;
+        NewRelicMessage other = (NewRelicMessage) o;
 
         if (traceData == null) {
             return other.traceData == null;

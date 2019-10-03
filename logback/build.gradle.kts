@@ -19,8 +19,8 @@ configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
     compile("com.fasterxml.jackson.core:jackson-core:2.9.9")
-    compile("ch.qos.logback:logback-core:1.2.3")
-    compile("ch.qos.logback:logback-classic:1.2.3")
+    compile("ch.qos.logback:logback-core:1.2.0")
+    compile("ch.qos.logback:logback-classic:1.2.0")
     compile("com.newrelic.agent.java:newrelic-api:5.6.0")
     includeInJar(project(":core"))
 
