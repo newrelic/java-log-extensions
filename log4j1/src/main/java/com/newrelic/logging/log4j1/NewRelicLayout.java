@@ -7,10 +7,12 @@ package com.newrelic.logging.log4j1;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
+import com.newrelic.logging.core.ExceptionUtil;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
+import org.apache.log4j.spi.ThrowableInformation;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -79,6 +81,13 @@ public class NewRelicLayout extends Layout {
             });
         }
 
+        if (event.getThrowableInformation() != null && event.getThrowableInformation().getThrowable() != null) {
+            Throwable throwable = event.getThrowableInformation().getThrowable();
+            generator.writeObjectField(ElementName.ERROR_CLASS, throwable.getClass().getName());
+            generator.writeObjectField(ElementName.ERROR_MESSAGE, throwable.getMessage());
+            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(throwable));
+        }
+
         generator.writeEndObject();
     }
 
@@ -87,7 +96,7 @@ public class NewRelicLayout extends Layout {
      */
     @Override
     public boolean ignoresThrowable() {
-        return true;
+        return false;
     }
 
     /**

@@ -28,3 +28,13 @@ application {
             "-Djava.util.logging.config.file=src/main/resources/logging.properties"
     )
 }
+
+tasks.register("makeLogsDir") {
+    doLast {
+        mkdir("logs")
+    }
+}
+
+val run by tasks.getting(JavaExec::class) {
+    dependsOn("makeLogsDir")
+}

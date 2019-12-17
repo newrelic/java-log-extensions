@@ -10,9 +10,11 @@ import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static com.newrelic.logging.core.ElementName.TIMESTAMP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class LogAsserts {
@@ -53,6 +55,13 @@ public class LogAsserts {
                 case "java.lang.String":
                     assertEquals(valueToken, JsonToken.VALUE_STRING);
                     assertEquals(parser.getValueAsString(), expectedValue);
+                    break;
+                case "java.util.regex.Pattern":
+                    Pattern pattern = (Pattern)expectedValue;
+                    assertEquals(valueToken, JsonToken.VALUE_STRING);
+                    assertTrue(
+                            pattern.matcher(parser.getValueAsString()).matches(),
+                            "Regex >>" + pattern.pattern() + "<< not present in string: >>" + parser.getValueAsString() + "<<");
                     break;
                 default:
                     fail("Unexpected value type, add a case here to handle it: " + expectedValue.getClass());

@@ -32,6 +32,7 @@ class NewRelicLogRecord extends LogRecord {
         setSourceClassName(record.getSourceClassName());
         setSourceMethodName(record.getSourceMethodName());
         setThreadID(record.getThreadID());
+        setThrown(record.getThrown());
     }
 
     private final String threadName;

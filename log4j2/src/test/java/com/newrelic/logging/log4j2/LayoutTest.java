@@ -7,6 +7,7 @@ package com.newrelic.logging.log4j2;
 
 import com.google.common.collect.ImmutableMap;
 import com.newrelic.api.agent.Agent;
+import com.newrelic.logging.core.LogAsserts;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.message.ParameterizedMessage;
@@ -18,7 +19,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
+import static com.newrelic.logging.core.ElementName.ERROR_CLASS;
+import static com.newrelic.logging.core.ElementName.ERROR_MESSAGE;
+import static com.newrelic.logging.core.ElementName.ERROR_STACK;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LayoutTest {
@@ -94,6 +100,26 @@ class LayoutTest {
                         + "\"some.key\":\"some.value\""
                         + "}\\n"
         ));
+    }
+
+    @Test
+    void shouldRenderExceptionFieldsJustFine() throws Exception {
+        NewRelicLayout target = NewRelicLayout.factory();
+        Log4jLogEvent event = Log4jLogEvent.newBuilder()
+                .setMessage(new NewRelicMessage("Here's a message"))
+                .setLevel(Level.WARN)
+                .setLoggerName("logger-name")
+                .setThrown(new Exception("~~ oops ~~"))
+                .build();
+
+        String output = target.toSerializable(event);
+        System.out.println("output = " + output);
+
+        LogAsserts.assertFieldValues(output, ImmutableMap.<String, Object>builder()
+                .put(ERROR_CLASS, "java.lang.Exception")
+                .put(ERROR_MESSAGE, "~~ oops ~~")
+                .put(ERROR_STACK, Pattern.compile(".*LayoutTest\\.shouldRenderExceptionFieldsJustFine.*", Pattern.DOTALL))
+                .build());
     }
 
     @BeforeEach

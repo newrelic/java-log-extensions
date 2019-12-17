@@ -13,6 +13,9 @@ public class ElementName {
     public static final String CLASS_NAME = "class.name";
     public static final String METHOD_NAME = "method.name";
     public static final String LINE_NUMBER = "line.number";
+    public static final String ERROR_MESSAGE = "error.message";
+    public static final String ERROR_CLASS = "error.class";
+    public static final String ERROR_STACK = "error.stack";
 
     private ElementName() {}
 }

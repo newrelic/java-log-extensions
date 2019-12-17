@@ -16,12 +16,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.logging.LogRecord;
+import java.util.regex.Pattern;
 
 import static com.newrelic.logging.core.ElementName.CLASS_NAME;
+import static com.newrelic.logging.core.ElementName.ERROR_CLASS;
+import static com.newrelic.logging.core.ElementName.ERROR_MESSAGE;
+import static com.newrelic.logging.core.ElementName.ERROR_STACK;
 import static com.newrelic.logging.core.ElementName.LOGGER_NAME;
 import static com.newrelic.logging.core.ElementName.LOG_LEVEL;
 import static com.newrelic.logging.core.ElementName.MESSAGE;
@@ -63,6 +69,26 @@ class LoggingEventTest {
                 .put("an.opaque", "value")
                 .build()
         );
+    }
+
+    @Test
+    void shouldRenderExceptionFieldsJustFine() throws Exception {
+        givenMockReturnsAnOpaqueValue();
+        givenAppenderChainIsConfiguredForOneMessage();
+
+        LoggingEvent evt = new LoggingEvent("abc", Logger.getLogger("foo"), 123123123123L, Level.INFO,
+                "whoopsie", new Exception("~~ oops ~~"));
+
+
+        targetAppender.append(evt);
+
+        whenOneMessageIsConfirmedLogged();
+
+        LogAsserts.assertFieldValues(innerAppender.appendedStrings.get(0), ImmutableMap.<String, Object>builder()
+                .put(ERROR_CLASS, "java.lang.Exception")
+                .put(ERROR_MESSAGE, "~~ oops ~~")
+                .put(ERROR_STACK, Pattern.compile(".*LoggingEventTest\\.shouldRenderExceptionFieldsJustFine.*", Pattern.DOTALL))
+                .build());
     }
 
     @Test

@@ -7,6 +7,7 @@ package com.newrelic.logging.log4j2;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
+import com.newrelic.logging.core.ExceptionUtil;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
@@ -80,6 +81,13 @@ public class NewRelicLayout extends AbstractStringLayout {
             for (Map.Entry<String, String> traceEntry : traceData.entrySet()) {
                 generator.writeStringField(traceEntry.getKey(), traceEntry.getValue());
             }
+        }
+
+        Throwable throwable = event.getThrown();
+        if (throwable != null) {
+            generator.writeObjectField(ElementName.ERROR_CLASS, throwable.getClass().getName());
+            generator.writeObjectField(ElementName.ERROR_MESSAGE, throwable.getMessage());
+            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(throwable));
         }
 
         generator.writeEndObject();

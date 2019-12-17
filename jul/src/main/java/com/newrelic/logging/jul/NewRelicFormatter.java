@@ -7,6 +7,7 @@ package com.newrelic.logging.jul;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
+import com.newrelic.logging.core.ExceptionUtil;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -58,6 +59,12 @@ public class NewRelicFormatter extends Formatter {
             for (Map.Entry<String, String> traceEntry : traceData.entrySet()) {
                 generator.writeStringField(traceEntry.getKey(), traceEntry.getValue());
             }
+        }
+
+        if (record.getThrown() != null) {
+            generator.writeObjectField(ElementName.ERROR_CLASS, record.getThrown().getClass().getName());
+            generator.writeObjectField(ElementName.ERROR_MESSAGE, record.getThrown().getMessage());
+            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(record.getThrown()));
         }
 
         generator.writeEndObject();
