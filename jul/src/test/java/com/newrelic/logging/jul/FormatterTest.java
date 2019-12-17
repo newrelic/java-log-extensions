@@ -12,8 +12,12 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.regex.Pattern;
 
 import static com.newrelic.logging.core.ElementName.CLASS_NAME;
+import static com.newrelic.logging.core.ElementName.ERROR_CLASS;
+import static com.newrelic.logging.core.ElementName.ERROR_MESSAGE;
+import static com.newrelic.logging.core.ElementName.ERROR_STACK;
 import static com.newrelic.logging.core.ElementName.LOGGER_NAME;
 import static com.newrelic.logging.core.ElementName.LOG_LEVEL;
 import static com.newrelic.logging.core.ElementName.MESSAGE;
@@ -50,6 +54,21 @@ class FormatterTest {
                 .put(LOGGER_NAME, getClass().getName())
                 .put(CLASS_NAME, "source-class")
                 .put(METHOD_NAME, "source-method")
+                .build());
+    }
+
+    @Test
+    void shouldRenderExceptionFieldsJustFine() throws IOException {
+        LogRecord record = new LogRecord(Level.FINE, "Here's a throwable");
+        record.setThrown(new Exception("~~ oops ~~"));
+
+        NewRelicFormatter target = new NewRelicFormatter();
+        String result = target.format(record);
+
+        LogAsserts.assertFieldValues(result, ImmutableMap.<String, Object>builder()
+                .put(ERROR_CLASS, "java.lang.Exception")
+                .put(ERROR_MESSAGE, "~~ oops ~~")
+                .put(ERROR_STACK, Pattern.compile(".*FormatterTest\\.shouldRenderExceptionFieldsJustFine.*", Pattern.DOTALL))
                 .build());
     }
 

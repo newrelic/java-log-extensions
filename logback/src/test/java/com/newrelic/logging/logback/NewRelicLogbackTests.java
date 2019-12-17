@@ -10,6 +10,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.collect.ImmutableMap;
 import com.newrelic.api.agent.Agent;
@@ -29,6 +30,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -74,6 +76,18 @@ class NewRelicLogbackTests {
         thenTheCallerDataIsInTheMessage();
     }
 
+
+    @Test
+    @Timeout(3)
+    void shouldAppendErrorDataCorrectly() throws Throwable {
+        givenMockAgentData();
+        givenARedirectedAppender();
+        givenALoggingEventWithExceptionData();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheExceptionDataIsInTheMessage();
+    }
+
     private void givenMockAgentData() {
         Agent mockAgent = Mockito.mock(Agent.class);
         Mockito.when(mockAgent.getLinkingMetadata()).thenReturn(ImmutableMap.of("some.key", "some.value"));
@@ -88,6 +102,11 @@ class NewRelicLogbackTests {
         event = new LoggingEvent();
         event.setMessage("test_error_message");
         event.setLevel(Level.ERROR);
+    }
+
+    private void givenALoggingEventWithExceptionData() {
+        givenALoggingEvent();
+        event.setThrowableProxy(new ThrowableProxy(new Exception("~~ oops ~~")));
     }
 
     private void givenALoggingEventWithCallerData() {
@@ -140,6 +159,16 @@ class NewRelicLogbackTests {
         LogAsserts.assertFieldValues(
                 getOutput(),
                 ImmutableMap.of("class.name", this.getClass().getName(), "method.name", "givenALoggingEventWithCallerData")
+        );
+    }
+
+    private void thenTheExceptionDataIsInTheMessage() throws Throwable {
+        LogAsserts.assertFieldValues(
+                getOutput(),
+                ImmutableMap.of(
+                        "error.class", "java.lang.Exception",
+                        "error.stack", Pattern.compile(".*NewRelicLogbackTests\\.shouldAppendErrorDataCorrectly.*", Pattern.DOTALL),
+                        "error.message", "~~ oops ~~")
         );
     }
 

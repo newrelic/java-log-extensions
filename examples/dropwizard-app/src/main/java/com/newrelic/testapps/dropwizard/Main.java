@@ -62,7 +62,9 @@ public class Main  extends Application<AppConfiguration> {
     @Trace(dispatcher = true)
     private static void transactionWithError(String message) {
         logger.error(message);
-        NewRelic.noticeError(new RuntimeException("Whoops!"));
+        Throwable t = new RuntimeException("Whoops!");
+        NewRelic.noticeError(t);
+        logger.error("this contains a throwable", t);
         logger.error("This is a secondary error in the same span as the error message");
     }
 

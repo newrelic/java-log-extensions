@@ -66,7 +66,9 @@ public class Main {
     @Trace(dispatcher = true)
     private static void transactionWithError(String message) {
         logger.severe(message);
-        NewRelic.noticeError(new RuntimeException("Whoops!"));
+        Throwable t = new RuntimeException("Whoops!");
+        NewRelic.noticeError(t);
+        logger.log(Level.SEVERE, "this contains a throwable", t);
         logger.severe("This is a secondary error in the same span as the error message");
         logger.severe(() -> MessageFormat.format(bundle.getString("MSI123"), "inserts"));
     }
