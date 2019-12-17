@@ -18,15 +18,15 @@ val includeInJar: Configuration by configurations.creating
 configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
-    compile("io.dropwizard:dropwizard-logging:1.3.14")
-    compile("com.newrelic.agent.java:newrelic-api:5.6.0")
+    implementation("io.dropwizard:dropwizard-logging:1.3.14")
+    implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
     includeInJar(project(":logback")) {
         isTransitive = false
     }
 
-    testCompile("org.junit.jupiter:junit-jupiter:5.5.1")
-    testCompile("org.mockito:mockito-core:3.0.7")
-    testCompile(project(":logback"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
+    testImplementation("org.mockito:mockito-core:3.0.7")
+    testImplementation(project(":logback"))
 }
 
 val jar by tasks.getting(Jar::class) {

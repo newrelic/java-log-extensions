@@ -10,10 +10,10 @@ repositories {
 }
 
 dependencies {
-    compile("io.dropwizard:dropwizard-core:1.3.14")
-    compile("io.dropwizard:dropwizard-logging:1.3.14")
-    compile(project(":dropwizard"))
-    compile("com.newrelic.agent.java:newrelic-api:5.6.0")
+    implementation("io.dropwizard:dropwizard-core:1.3.14")
+    implementation("io.dropwizard:dropwizard-logging:1.3.14")
+    implementation(project(":dropwizard"))
+    implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
 }
 
 configure<JavaPluginConvention> {

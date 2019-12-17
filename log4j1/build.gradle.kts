@@ -16,16 +16,16 @@ val includeInJar: Configuration by configurations.creating
 configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
-    compile("com.fasterxml.jackson.core:jackson-core:2.9.9")
-    compile("log4j:log4j:1.2.17")
-    compile("com.newrelic.agent.java:newrelic-api:5.6.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.9.9")
+    implementation("log4j:log4j:1.2.17")
+    implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
     includeInJar(project(":core"))
 
-    testCompile("org.junit.jupiter:junit-jupiter-api:5.5.1")
-    testCompile("com.google.guava:guava:28.0-jre")
-    testCompile("org.mockito:mockito-core:3.0.7")
-    testCompile(project(":core"))
-    testCompile(project(":core-test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
+    testImplementation("com.google.guava:guava:28.0-jre")
+    testImplementation("org.mockito:mockito-core:3.0.7")
+    testImplementation(project(":core"))
+    testImplementation(project(":core-test"))
 }
 
 val jar by tasks.getting(Jar::class) {
