@@ -32,22 +32,22 @@ public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     private NewRelicJsonLayout layout = new NewRelicJsonLayout();
 
     @Override
-	public void doEncode(ILoggingEvent event) throws IOException {
-    	String laidOutResult = layout.doLayout(event);
-	    ByteBuffer results = StandardCharsets.UTF_8.encode(laidOutResult);
-	    byte[] resultArray = results.array();
-	    int i = resultArray.length - 1;
-	    while (i > 0 && resultArray[i - 1] == '\0') {
-	        i--;
-	    }
+    public void doEncode(ILoggingEvent event) throws IOException {
+        String laidOutResult = layout.doLayout(event);
+        ByteBuffer results = StandardCharsets.UTF_8.encode(laidOutResult);
+        byte[] resultArray = results.array();
+        int i = resultArray.length - 1;
+        while (i > 0 && resultArray[i - 1] == '\0') {
+            i--;
+        }
 
-	    try {
-			super.outputStream.write(Arrays.copyOfRange(resultArray, 0, i));
-			super.outputStream.flush();
-		} catch (IOException e) {
-		    addWarn("Error encountered while writing log event. Event: " + event, e);
-		}
-	}
+        try {
+            super.outputStream.write(Arrays.copyOfRange(resultArray, 0, i));
+            super.outputStream.flush();
+        } catch (IOException e) {
+            addWarn("Error encountered while writing log event. Event: " + event, e);
+        }
+    }
 
     @Override
     public void start() {
@@ -55,7 +55,7 @@ public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
         layout.start();
     }
 
-	@Override
-	public void close() throws IOException {
-	}
+    @Override
+    public void close() throws IOException {
+    }
 }
