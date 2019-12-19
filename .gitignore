@@ -4,3 +4,9 @@ lib/
 build/
 logs/
 out/
+bin/
+**/.DS_Store
+**/.classpath
+**/.project
+*.prefs
+**/.java-version
