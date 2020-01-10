@@ -18,6 +18,6 @@
           We have to write to a static because otherwise this value is set based on a classload.
         -->
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-        <Class name="com.newrelic.logging.logback11.NewRelicLogbackTests"/>
+        <Class name="com.newrelic.logging.logback11.NewRelicLogback11Tests"/>
     </Match>
 </FindBugsFilter>
