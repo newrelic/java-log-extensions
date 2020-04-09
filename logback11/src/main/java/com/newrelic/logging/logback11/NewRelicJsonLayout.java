@@ -34,7 +34,7 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     private void writeToGenerator(ILoggingEvent event, JsonGenerator generator) throws IOException {
         generator.writeStartObject();
 
-        generator.writeStringField(ElementName.MESSAGE, event.getFormattedMessage().replace('\"', '\''));
+        generator.writeStringField(ElementName.MESSAGE, event.getFormattedMessage());
         generator.writeNumberField(ElementName.TIMESTAMP, event.getTimeStamp());
         generator.writeStringField(ElementName.LOG_LEVEL, event.getLevel().toString());
         generator.writeStringField(ElementName.LOGGER_NAME, event.getLoggerName());
