@@ -2,7 +2,7 @@
  * Copyright 2019 New Relic Corporation. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.newrelic.testapps.logback;
+package com.newrelic.testapps.logback11;
 
 import ch.qos.logback.classic.LoggerContext;
 import com.newrelic.api.agent.NewRelic;

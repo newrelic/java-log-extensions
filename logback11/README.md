@@ -1,8 +1,8 @@
-# The New Relic Logback Extension
+# The New Relic Logback 1.1.x Extension
 
 ## Preconditions
 
-1. logback 1.2.x must be configured and working in the application.
+1. logback 1.1.x must be configured and working in the application.
 2. The New Relic Java agent must be enabled using the `-javaagent` command-line parameter.
 3. You must be using at least version 5.6.0 of the Java Agent.
 
@@ -13,8 +13,7 @@ Logback Extension. All steps are required.
 
 ### 1. Include the dependency in your project.
 
-Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:logback) for the appropriate snippets.
-
+Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:logback11) for the appropriate snippets.
 
 ### 2. Configure an `<appender>` element with a `NewRelicEncoder`.
 
@@ -23,7 +22,7 @@ Update your logging configuration xml to include the `<encoder>` element like be
 ```xml
     <appender name="LOG_FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/app-log-file.log</file>
-        <encoder class="com.newrelic.logging.logback.NewRelicEncoder"/>
+        <encoder class="com.newrelic.logging.logback11.NewRelicEncoder"/>
     </appender>
 ```
 
@@ -37,7 +36,7 @@ Update your logging configuration xml to add this section. Change `"LOG_FILE"` t
 you updated in the previous step.
 
 ```xml
-    <appender name="ASYNC" class="com.newrelic.logging.logback.NewRelicAsyncAppender">
+    <appender name="ASYNC" class="com.newrelic.logging.logback11.NewRelicAsyncAppender">
         <appender-ref ref="LOG_FILE" />
     </appender>
 ```
