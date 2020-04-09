@@ -2,6 +2,7 @@
 name: Publish - Java Log Extensions
 
 trigger: none
+pr: none
 
 pool:
   vmImage: 'ubuntu-latest'
