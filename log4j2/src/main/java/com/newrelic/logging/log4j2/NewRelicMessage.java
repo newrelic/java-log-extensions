@@ -9,7 +9,7 @@ import org.apache.logging.log4j.message.ParameterizedMessage;
 /**
  * This class is provided for backward compatibility and is now a no-op.
  *
- * @deprecated Use NewRelicContextProvider instead.
+ * @deprecated Use NewRelicContextDataProvider instead.
  */
 public class NewRelicMessage extends ParameterizedMessage {
 
