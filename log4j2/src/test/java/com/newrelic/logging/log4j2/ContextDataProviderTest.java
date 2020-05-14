@@ -34,7 +34,7 @@ import com.newrelic.api.agent.Agent;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Class Description goes here.
+ * Verify that the ContextDataProvider is passing data.
  */
 public class ContextDataProviderTest {
 

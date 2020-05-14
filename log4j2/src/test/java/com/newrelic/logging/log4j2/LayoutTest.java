@@ -38,14 +38,14 @@ class LayoutTest {
                 .build();
 
         String output = target.toSerializable(event);
-        System.out.println("Message output: " + output);
         assertTrue(output.matches(
                 "\\{"
                         + "\"message\":\"Here's a message\","
                         + "\"timestamp\":\\d+,"
                         + "\"thread.name\":\"[^\"]+\","
                         + "\"log.level\":\"ERROR\","
-                        + "\"logger.name\":\"logger-name\""
+                        + "\"logger.name\":\"logger-name\","
+                        + "\"some.key\":\"some.value\""
                         + "}\\n"
         ));
     }
@@ -71,60 +71,15 @@ class LayoutTest {
                         + "\"logger.name\":\"logger-name\","
                         + "\"class.name\":\"\\S+\","
                         + "\"method.name\":\"\\S+\","
-                        + "\"line.number\":\\d+"
-                        + "}\\n"
-        ));
-    }
-
-    @Test
-    void shouldLayoutNewRelicMessage() {
-        NewRelicLayout target = NewRelicLayout.factory();
-        Log4jLogEvent event = Log4jLogEvent.newBuilder()
-                .setMessage(new NewRelicMessage("Here's a message"))
-                .setLevel(Level.WARN)
-                .setLoggerName("logger-name")
-                .setSource(new Exception().getStackTrace()[0])
-                .setIncludeLocation(true)
-                .build();
-
-        String output = target.toSerializable(event);
-        assertTrue(output.matches(
-                "\\{"
-                        + "\"message\":\"Here's a message\","
-                        + "\"timestamp\":\\d+,"
-                        + "\"thread.name\":\"[^\"]+\","
-                        + "\"log.level\":\"WARN\","
-                        + "\"logger.name\":\"logger-name\","
-                        + "\"class.name\":\"\\S+\","
-                        + "\"method.name\":\"\\S+\","
                         + "\"line.number\":\\d+,"
                         + "\"some.key\":\"some.value\""
                         + "}\\n"
         ));
     }
 
-    @Test
-    void shouldRenderExceptionFieldsJustFine() throws Exception {
-        NewRelicLayout target = NewRelicLayout.factory();
-        Log4jLogEvent event = Log4jLogEvent.newBuilder()
-                .setMessage(new NewRelicMessage("Here's a message"))
-                .setLevel(Level.WARN)
-                .setLoggerName("logger-name")
-                .setThrown(new Exception("~~ oops ~~"))
-                .build();
-
-        String output = target.toSerializable(event);
-
-        LogAsserts.assertFieldValues(output, ImmutableMap.<String, Object>builder()
-                .put(ERROR_CLASS, "java.lang.Exception")
-                .put(ERROR_MESSAGE, "~~ oops ~~")
-                .put(ERROR_STACK, Pattern.compile(".*LayoutTest\\.shouldRenderExceptionFieldsJustFine.*", Pattern.DOTALL))
-                .build());
-    }
 
     @BeforeEach
     void setUp() {
-        Mockito.when(contextMockAgent.getLinkingMetadata()).thenReturn(null);
         Mockito.when(mockAgent.getLinkingMetadata()).thenReturn(ImmutableMap.of("some.key", "some.value"));
     }
 
@@ -135,19 +90,16 @@ class LayoutTest {
 
     @AfterAll
     static void tearDownClass() {
-        NewRelicMessage.agentSupplier = cachedAgent;
+        NewRelicContextDataProvider.agentSupplier = cachedAgent;
     }
 
     @BeforeAll
     static void setUpClass() {
         mockAgent = Mockito.mock(Agent.class);
-        contextMockAgent = Mockito.mock(Agent.class);
-        NewRelicContextDataProvider.agentSupplier = () -> contextMockAgent;
-        NewRelicMessage.agentSupplier = () -> mockAgent;
-        cachedAgent = NewRelicMessage.agentSupplier;
+        NewRelicContextDataProvider.agentSupplier = () -> mockAgent;
+        cachedAgent = NewRelicContextDataProvider.agentSupplier;
     }
 
     private static Agent mockAgent;
-    private static Agent contextMockAgent;
     private static Supplier<Agent> cachedAgent;
 }
