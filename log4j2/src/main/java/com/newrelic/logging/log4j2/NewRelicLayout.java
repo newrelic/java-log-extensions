@@ -14,6 +14,7 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.AbstractStringLayout;
+import org.apache.logging.log4j.util.ReadOnlyStringMap;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -76,7 +77,18 @@ public class NewRelicLayout extends AbstractStringLayout {
             generator.writeObjectField(ElementName.LINE_NUMBER, event.getSource().getLineNumber());
         }
 
-        if (event.getMessage() instanceof NewRelicMessage) {
+        Map<String, String> map = event.getContextData().toMap();
+        boolean published = false;
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (entry.getKey().startsWith(NewRelicContextDataProvider.NEW_RELIC_PREFIX)) {
+                    String key = entry.getKey().substring(NewRelicContextDataProvider.NEW_RELIC_PREFIX.length());
+                    generator.writeStringField(key , entry.getValue());
+                    published = true;
+                }
+            }
+        }
+        if (!published && event.getMessage() instanceof NewRelicMessage) {
             Map<String, String> traceData = ((NewRelicMessage) event.getMessage()).getTraceData();
             for (Map.Entry<String, String> traceEntry : traceData.entrySet()) {
                 generator.writeStringField(traceEntry.getKey(), traceEntry.getValue());

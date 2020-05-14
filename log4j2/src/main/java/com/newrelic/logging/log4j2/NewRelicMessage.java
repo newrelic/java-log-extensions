@@ -17,6 +17,10 @@ import java.util.function.Supplier;
  * To capture New Relic trace data along with a log message, the trace and span must be captured at
  * the time the message is logged. This class accommodates that. Create an instance of this class
  * instead of {@link ParameterizedMessage} or {@link org.apache.logging.log4j.message.Message} directly.
+ *
+ * @deprecated Use NewRelicContextProvider instead. This class has two serious problems:
+ * 1. It only works with ParameterizedMessages.
+ * 2. It obtains the trace data even for Messages that will never be published causing unnecessary overhead.
  */
 public class NewRelicMessage extends ParameterizedMessage {
     private final Map<String, String> traceData;

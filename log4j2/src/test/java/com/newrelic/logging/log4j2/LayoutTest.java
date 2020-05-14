@@ -38,6 +38,7 @@ class LayoutTest {
                 .build();
 
         String output = target.toSerializable(event);
+        System.out.println("Message output: " + output);
         assertTrue(output.matches(
                 "\\{"
                         + "\"message\":\"Here's a message\","
@@ -113,7 +114,6 @@ class LayoutTest {
                 .build();
 
         String output = target.toSerializable(event);
-        System.out.println("output = " + output);
 
         LogAsserts.assertFieldValues(output, ImmutableMap.<String, Object>builder()
                 .put(ERROR_CLASS, "java.lang.Exception")
@@ -124,6 +124,7 @@ class LayoutTest {
 
     @BeforeEach
     void setUp() {
+        Mockito.when(contextMockAgent.getLinkingMetadata()).thenReturn(null);
         Mockito.when(mockAgent.getLinkingMetadata()).thenReturn(ImmutableMap.of("some.key", "some.value"));
     }
 
@@ -140,10 +141,13 @@ class LayoutTest {
     @BeforeAll
     static void setUpClass() {
         mockAgent = Mockito.mock(Agent.class);
+        contextMockAgent = Mockito.mock(Agent.class);
+        NewRelicContextDataProvider.agentSupplier = () -> contextMockAgent;
         NewRelicMessage.agentSupplier = () -> mockAgent;
         cachedAgent = NewRelicMessage.agentSupplier;
     }
 
     private static Agent mockAgent;
+    private static Agent contextMockAgent;
     private static Supplier<Agent> cachedAgent;
 }

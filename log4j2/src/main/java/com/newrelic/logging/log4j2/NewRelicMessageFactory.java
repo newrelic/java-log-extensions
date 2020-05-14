@@ -19,6 +19,7 @@ import org.apache.logging.log4j.message.Message;
  * }</pre>
  *
  * @see <a href="https://logging.apache.org/log4j/2.x/manual/configuration.html#SystemProperties">Log4j 2.x System Properties</a>
+ * @deprecated Use NewRelicContextDataProvider
  */
 public class NewRelicMessageFactory extends AbstractMessageFactory {
     @Override
