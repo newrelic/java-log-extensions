@@ -76,10 +76,13 @@ public class NewRelicLayout extends AbstractStringLayout {
             generator.writeObjectField(ElementName.LINE_NUMBER, event.getSource().getLineNumber());
         }
 
-        if (event.getMessage() instanceof NewRelicMessage) {
-            Map<String, String> traceData = ((NewRelicMessage) event.getMessage()).getTraceData();
-            for (Map.Entry<String, String> traceEntry : traceData.entrySet()) {
-                generator.writeStringField(traceEntry.getKey(), traceEntry.getValue());
+        Map<String, String> map = event.getContextData().toMap();
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (entry.getKey().startsWith(NewRelicContextDataProvider.NEW_RELIC_PREFIX)) {
+                    String key = entry.getKey().substring(NewRelicContextDataProvider.NEW_RELIC_PREFIX.length());
+                    generator.writeStringField(key , entry.getValue());
+                }
             }
         }
 

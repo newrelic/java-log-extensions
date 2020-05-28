@@ -29,8 +29,7 @@ application {
     mainClassName = "PerformanceMain"
     applicationDefaultJvmArgs += listOf(
             "-javaagent:${rootProject.projectDir}/lib/newrelic.jar",
-            "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",
-            "-Dlog4j2.messageFactory=com.newrelic.log4j2.plugin.NewRelicMessageFactory"
+            "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
     )
 }
 
@@ -39,7 +38,6 @@ task("executeNoAgent", JavaExec::class) {
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "No_Agent")
     jvmArgs("-Xmx1024m")
-    systemProperty("log4j2.messageFactory", "com.newrelic.log4j2.plugin.NewRelicMessageFactory")
 }
 
 task("executeWithAgent", JavaExec::class) {
@@ -47,7 +45,6 @@ task("executeWithAgent", JavaExec::class) {
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "With_Agent")
     jvmArgs("-Xmx1024m", "-javaagent:${rootProject.projectDir}/lib/newrelic.jar")
-    systemProperty("log4j2.messageFactory", "com.newrelic.log4j2.plugin.NewRelicMessageFactory")
 }
 
 task("executeNoAgentAsync", JavaExec::class) {
@@ -55,7 +52,6 @@ task("executeNoAgentAsync", JavaExec::class) {
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "No_Agent_Async")
     jvmArgs("-Xmx1024m")
-    systemProperty("log4j2.messageFactory", "com.newrelic.log4j2.plugin.NewRelicMessageFactory")
     systemProperty("log4j2.contextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector")
 }
 
@@ -64,7 +60,6 @@ task("executeWithAgentAsync", JavaExec::class) {
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "With_Agent_Async")
     jvmArgs("-Xmx1024m", "-javaagent:${rootProject.projectDir}/lib/newrelic.jar")
-    systemProperty("log4j2.messageFactory", "com.newrelic.log4j2.plugin.NewRelicMessageFactory")
     systemProperty("log4j2.contextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector")
 }
 

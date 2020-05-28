@@ -15,19 +15,7 @@ log4j 2.x Extension. All steps are required.
 
 Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:log4j2) for the appropriate snippets.
 
-
-### 2. Add `packages="com.newrelic.logging.log4j2"` to the `Configuration` element.
-
-Update your logging configuration xml to add a `packages` attribute.
-
-```xml
-<Configuration xmlns="http://logging.apache.org/log4j/2.0/config"
-               packages="com.newrelic.logging.log4j2">
-```
-
-*Why?* This attribute tells the XML parser that some classes are found in a non-standard package.
-
-### 3. Use a `NewRelicLayout` element within one of the appenders.
+### 2. Use a `NewRelicLayout` element within one of the appenders.
 
 Update your logging configuration xml to add `<NewRelicLayout/>` like this:
 
@@ -48,16 +36,4 @@ or like this:
 *Why?* The New Relic log format is a tailored JSON format with specific fields in specific places
         that our log forwarder plugins and back end rely on. At this time, we don't support any customization
         of that format.
-
-### 4. Set the `log4j2.messageFactory` property to the `NewRelicMessageFactory`.
-
-The exact method will vary depending on the application framework. One option is to change
-the [`java` command-line with `-D`](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html#BABDJJFI).
-You may also have application properties files in your project.
-
-```properties
-log4j2.messageFactory=com.newrelic.logging.log4j2.NewRelicMessageFactory
 ```
-
-*Why?* The New Relic log format includes New Relic-specific data that must be captured on the thread the log message
-is coming from. This `MessageFactory` instance is the log4j 2.x hook to do this.
