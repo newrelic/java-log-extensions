@@ -4,8 +4,11 @@ plugins {
 }
 
 group = "com.newrelic.logging"
-val releaseVersion: String? by project
-version = releaseVersion ?: "1.0-SNAPSHOT"
+
+// -Prelease=true will render a non-snapshot version
+// All other values (including unset) will render a snapshot version.
+val release: String? by project
+version = "2.0" + if("true" == release) "" else "-SNAPSHOT"
 
 repositories {
     mavenCentral()
