@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.github.spotbugs").version("2.0.0")
+    id("com.github.spotbugs").version("4.4.4")
 }
 
 group = "com.newrelic.logging"
@@ -63,10 +63,9 @@ tasks.register<Jar>("javadocJar") {
 
 apply(from = "$rootDir/gradle/publish.gradle.kts")
 
-tasks.withType<com.github.spotbugs.SpotBugsTask> {
-    excludeFilter = file("spotbugs-filter.xml")
-    reports {
-        html.isEnabled = true
-        xml.isEnabled = false
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
+    excludeFilter.set(file("spotbugs-filter.xml"))
+    reports.create("html") {
+        isEnabled = true
     }
 }
