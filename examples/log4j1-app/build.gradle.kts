@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":log4j1"))
 
     implementation("log4j:log4j:1.2.17")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.9.9")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
 }
 

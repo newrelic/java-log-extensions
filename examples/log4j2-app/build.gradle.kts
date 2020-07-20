@@ -15,7 +15,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.12.1")
     runtimeOnly(project(":log4j2"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.9.9")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("com.lmax:disruptor:3.4.2")
     implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
 }

@@ -22,8 +22,8 @@ dependencies {
         isTransitive = false
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
-    testImplementation("org.mockito:mockito-core:3.0.7")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
+    testImplementation("org.mockito:mockito-core:3.4.4")
     testImplementation(project(":logback"))
 }
 
