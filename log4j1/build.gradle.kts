@@ -1,11 +1,14 @@
 plugins {
     java
-    id("com.github.spotbugs").version("2.0.0")
+    id("com.github.spotbugs").version("4.4.4")
 }
 
 group = "com.newrelic.logging"
-val releaseVersion: String? by project
-version = releaseVersion ?: "1.0-SNAPSHOT"
+
+// -Prelease=true will render a non-snapshot version
+// All other values (including unset) will render a snapshot version.
+val release: String? by project
+version = "2.0" + if ("true" == release) "" else "-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -16,14 +19,14 @@ val includeInJar: Configuration by configurations.creating
 configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-core:2.9.9")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("log4j:log4j:1.2.17")
     implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
     includeInJar(project(":core"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
-    testImplementation("com.google.guava:guava:28.0-jre")
-    testImplementation("org.mockito:mockito-core:3.0.7")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+    testImplementation("com.google.guava:guava:29.0-jre")
+    testImplementation("org.mockito:mockito-core:3.4.4")
     testImplementation(project(":core"))
     testImplementation(project(":core-test"))
 }
@@ -59,9 +62,8 @@ tasks.register<Jar>("javadocJar") {
 
 apply(from = "$rootDir/gradle/publish.gradle.kts")
 
-tasks.withType<com.github.spotbugs.SpotBugsTask> {
-    reports {
-        html.isEnabled = true
-        xml.isEnabled = false
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
+    reports.create("html") {
+        isEnabled = true
     }
 }

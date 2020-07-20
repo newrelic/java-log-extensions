@@ -1,13 +1,14 @@
-import com.github.spotbugs.SpotBugsTask
-
 plugins {
     java
-    id("com.github.spotbugs").version("2.0.0")
+    id("com.github.spotbugs").version("4.4.4")
 }
 
 group = "com.newrelic.logging"
-val releaseVersion: String? by project
-version = releaseVersion ?: "1.0-SNAPSHOT"
+
+// -Prelease=true will render a non-snapshot version
+// All other values (including unset) will render a snapshot version.
+val release: String? by project
+version = "2.0" + if ("true" == release) "" else "-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -24,8 +25,8 @@ dependencies {
         isTransitive = false
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
-    testImplementation("org.mockito:mockito-core:3.0.7")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
+    testImplementation("org.mockito:mockito-core:3.4.4")
     testImplementation(project(":logback"))
 }
 
@@ -59,9 +60,8 @@ tasks.register<Jar>("javadocJar") {
 
 apply(from = "$rootDir/gradle/publish.gradle.kts")
 
-tasks.withType(SpotBugsTask::class) {
-    reports {
-        html.isEnabled = true
-        xml.isEnabled = false
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
+    reports.create("html") {
+        isEnabled = true
     }
 }

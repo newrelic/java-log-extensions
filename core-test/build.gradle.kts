@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.junit.jupiter:junit-jupiter:5.5.1")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.9.9")
+    implementation("org.junit.jupiter:junit-jupiter:5.6.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation(project(":core"))
 }
 
