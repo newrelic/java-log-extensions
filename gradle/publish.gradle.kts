@@ -39,13 +39,17 @@ configure<PublishingExtension> {
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
 
             configure<SigningExtension> {
+                val signingKeyId: String? by project
+                val signingKey: String? by project
+                val signingPassword: String? by project
+                useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
                 setRequired({ gradle.taskGraph.hasTask("uploadArchives") })
                 sign(publications["mavenJava"])
             }
 
             credentials {
-                username = project.properties["sonatypeUsername"] as String?
-                password = project.properties["sonatypePassword"] as String?
+                username = System.getenv("SONATYPE_USERNAME")
+                password = System.getenv("SONATYPE_PASSWORD")
             }
         }
     }
