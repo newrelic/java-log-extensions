@@ -10,6 +10,5 @@
  * {@link com.newrelic.logging.log4j2.NewRelicMessageFactory}.
  *
  * @see <a href="https://logging.apache.org/log4j/2.x/">Apache Log4j</a>
- * @see <a href="https://source.datanerd.us/java-agent/log-plugins/blob/master/log4j2-plugin/README.md">Project README</a>
  */
 package com.newrelic.logging.log4j2;
