@@ -7,6 +7,5 @@
  * log message.
  *
  * @see <a href="https://logback.qos.ch/documentation.html">Logback Documentation</a>
- * @see <a href="https://source.datanerd.us/java-agent/log-plugins/blob/master/logback-plugin/README.md">Project README</a>
  */
 package com.newrelic.logging.logback;
