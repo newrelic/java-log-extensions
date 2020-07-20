@@ -11,8 +11,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.apache.logging.log4j:log4j-api:2.12.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.12.1")
+    implementation("org.apache.logging.log4j:log4j-api:2.13.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.13.1")
     runtimeOnly(project(":log4j2"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
@@ -30,7 +30,6 @@ application {
     mainClassName = "com.newrelic.testapps.log4j2.Main"
     applicationDefaultJvmArgs += listOf(
             "-javaagent:${rootProject.projectDir}/lib/newrelic.jar",
-            "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector",
-            "-Dlog4j2.messageFactory=com.newrelic.logging.log4j2.NewRelicMessageFactory"
+            "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
     )
 }
