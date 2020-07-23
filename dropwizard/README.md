@@ -60,5 +60,32 @@ logging:
         type: log-format
 ```
 
+## Adding linking metadata to the request log
+
+There are two important steps for adding linking metadata to the request log.
+
+### Include the `LinkingMetadataAsRequestAttributesFilter` for all resources
+
+```java
+    @Override
+    public void run(AppConfiguration configuration, Environment environment) {
+        environment.servlets().addFilter("trace-into-request", new LinkingMetadataAsRequestAttributesFilter())
+                .addMappingForUrlPatterns(null, true, "/*");
+    }
+```
+
+### Configure your request log to use `newrelic-access-json`
+
+This layout type is a JSON format stylized after OpenTelemetry attributes. _Do not_ use a `newrelic-` appender, only use the `newrelic-access-json` layout.
+
+```yaml
+server:
+  requestLog:
+    appenders:
+      - type: console
+        layout:
+          type: newrelic-access-json
+```
+
 --------------
 Dropwizard is © Copyright 2010-2013, Coda Hale, Yammer Inc., 2014-2017 Dropwizard Team.

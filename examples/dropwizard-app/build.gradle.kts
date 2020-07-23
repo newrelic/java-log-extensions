@@ -11,7 +11,6 @@ repositories {
 
 dependencies {
     implementation("io.dropwizard:dropwizard-core:1.3.14")
-    implementation("io.dropwizard:dropwizard-logging:1.3.14")
     implementation(project(":dropwizard"))
     implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
 }
@@ -31,6 +30,7 @@ val execTask by tasks.register("start", JavaExec::class) {
     dependsOn("jar")
     classpath = sourceSets.main.get().runtimeClasspath
     jvmArgs = listOf(
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
             "-javaagent:${rootProject.projectDir}/lib/newrelic.jar"
     )
     main = "com.newrelic.testapps.dropwizard.Main"
