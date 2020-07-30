@@ -26,8 +26,8 @@ public class NewRelicAccessJsonLayout extends LayoutBase<IAccessEvent> {
 
         try (JsonGenerator generator = new JsonFactory().createGenerator(sw)) {
             writeToGenerator(event, generator);
-        } catch (Throwable ignored) {
-            return event.getRequestURI();
+        } catch (Throwable throwable) {
+            sw.append(throwable.getMessage());
         }
 
         sw.append('\n');
@@ -40,16 +40,8 @@ public class NewRelicAccessJsonLayout extends LayoutBase<IAccessEvent> {
         generator.writeNumberField("timestamp", event.getTimeStamp());
         generator.writeNumberField("duration", event.getElapsedTime());
 
-        String target = event.getRequestURI();
-        if (event.getQueryString() != null && !event.getQueryString().equals("")) {
-            target += event.getQueryString();
-        }
-        generator.writeStringField("http.target", target);
-
-        String[] protocolPieces = event.getProtocol().split("/");
-        if (protocolPieces.length > 1) {
-            generator.writeStringField("http.flavor", protocolPieces[1]);
-        }
+        writeHttpTarget(event, generator);
+        writeHttpFlavor(event, generator);
 
         generator.writeNumberField("http.status_code", event.getStatusCode());
         generator.writeStringField("http.method", event.getMethod());
@@ -58,13 +50,39 @@ public class NewRelicAccessJsonLayout extends LayoutBase<IAccessEvent> {
         generator.writeStringField("net.peer.ip", event.getRemoteAddr());
         generator.writeStringField("net.peer.host", event.getRemoteHost());
 
+        writeLinkingMetadata(event, generator);
+
+        generator.writeEndObject();
+    }
+
+    private void writeLinkingMetadata(IAccessEvent event, JsonGenerator generator) throws IOException {
         for (String key : Arrays.asList("entity.guid", "entity.name", "entity.type", "hostname", "trace.id")) {
             String value = event.getAttribute(AccessLog.LINKING_NAMESPACE + key);
-            if (!Objects.equals(value, "")) {
+            if (value != null && !value.equals("")) {
                 generator.writeStringField(key, value);
             }
         }
+    }
 
-        generator.writeEndObject();
+    private void writeHttpFlavor(IAccessEvent event, JsonGenerator generator) throws IOException {
+        String protocol = event.getProtocol();
+        if (protocol != null) {
+            String[] protocolPieces = protocol.split("/");
+            if (protocolPieces.length > 1) {
+                generator.writeStringField("http.flavor", protocolPieces[1]);
+            }
+        }
+    }
+
+    private void writeHttpTarget(IAccessEvent event, JsonGenerator generator) throws IOException {
+        String target = "";
+        if (event.getRequestURI() != null && !event.getRequestURI().equals("")) {
+            target += event.getRequestURI();
+        }
+        ;
+        if (event.getQueryString() != null && !event.getQueryString().equals("")) {
+            target += event.getQueryString();
+        }
+        generator.writeStringField("http.target", target);
     }
 }
