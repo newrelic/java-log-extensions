@@ -58,7 +58,7 @@ public class NewRelicAccessJsonLayout extends LayoutBase<IAccessEvent> {
     private void writeLinkingMetadata(IAccessEvent event, JsonGenerator generator) throws IOException {
         for (String key : Arrays.asList("entity.guid", "entity.name", "entity.type", "hostname", "trace.id")) {
             String value = event.getAttribute(AccessLog.LINKING_NAMESPACE + key);
-            if (value != null && !value.equals("")) {
+            if (value != null && !value.equals("") && !value.equals("-")) {
                 generator.writeStringField(key, value);
             }
         }
