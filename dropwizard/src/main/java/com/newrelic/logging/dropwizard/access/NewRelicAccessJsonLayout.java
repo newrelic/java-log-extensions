@@ -12,8 +12,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Objects;
 
 /**
  * Provides a representation of the {@link IAccessEvent} in JSON. The attribute names are sourced from
