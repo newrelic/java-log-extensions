@@ -77,7 +77,6 @@ public class NewRelicAccessJsonLayout extends LayoutBase<IAccessEvent> {
         if (event.getRequestURI() != null && !event.getRequestURI().equals("")) {
             target += event.getRequestURI();
         }
-        ;
         if (event.getQueryString() != null && !event.getQueryString().equals("")) {
             target += event.getQueryString();
         }

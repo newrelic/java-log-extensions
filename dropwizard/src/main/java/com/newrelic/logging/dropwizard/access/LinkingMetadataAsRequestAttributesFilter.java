@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 /**
  * This filter adds New Relic's linking metadata to the {@link ServletRequest} attributes.
@@ -21,6 +22,14 @@ import java.io.IOException;
  * @see ServletRequest#setAttribute(String, Object)
  */
 public class LinkingMetadataAsRequestAttributesFilter implements javax.servlet.Filter {
+    public LinkingMetadataAsRequestAttributesFilter() {
+        this(NewRelic::getAgent);
+    }
+
+    LinkingMetadataAsRequestAttributesFilter(Supplier<Agent> agentSupplier) {
+        this.agentSupplier = agentSupplier;
+    }
+
     @Override
     public void init(FilterConfig filterConfig) {
     }
@@ -29,12 +38,13 @@ public class LinkingMetadataAsRequestAttributesFilter implements javax.servlet.F
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         chain.doFilter(request, response);
 
-        NewRelic.getAgent().getLinkingMetadata().entrySet()
-                .forEach(entry -> request.setAttribute(AccessLog.LINKING_NAMESPACE + entry.getKey(), entry.getValue()));
+        agentSupplier.get().getLinkingMetadata()
+                .forEach((key, value) -> request.setAttribute(AccessLog.LINKING_NAMESPACE + key, value));
     }
 
     @Override
     public void destroy() {
-
     }
+
+    private final Supplier<Agent> agentSupplier;
 }
