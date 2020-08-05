@@ -8,7 +8,8 @@ group = "com.newrelic.logging"
 // -Prelease=true will render a non-snapshot version
 // All other values (including unset) will render a snapshot version.
 val release: String? by project
-version = "2.0" + if ("true" == release) "" else "-SNAPSHOT"
+val releaseVersion: String by project
+version = releaseVersion + if ("true" == release) "" else "-SNAPSHOT"
 
 repositories {
     mavenLocal()
