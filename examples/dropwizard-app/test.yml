@@ -1,11 +1,25 @@
+# This is half the work for using New Relic linking metadata with Dropwizard request logging.
+# The `newrelic-access-json` layout type is a JSON format stylized after
+# OpenTelemetry attributes. The other half is adding the servlet filter (see Main.java in this project).
+server:
+  requestLog:
+    appenders:
+      - type: console # Any standard appender should work here. Don't use a newrelic appender as it doesn't include the appropriate field names.
+        layout:
+          type: newrelic-access-json # This layout is what you want.
+
 logging:
-  level: DEBUG
+  level: INFO
   appenders:
+    # This stanza uses the newrelic-file appender with the newrelic-json layout designed
+    # for use with Logs-in-Context. This should include all appropriate linking metadata.
     - type: newrelic-file
       layout:
         type: newrelic-json
       archive: false
       currentLogFilename: ./logs/my-app.log
+    # This stanza uses the newrelic-console appender with a standard format. Because
+    # linking metadata is included in the MDC, the attributes can be extracted in most any layout.
     - type: newrelic-console
       logFormat: "%date{ISO8601} %c %-5p: %m trace.id=%mdc{trace.id} span.id=%mdc{span.id}%n"
       layout:
