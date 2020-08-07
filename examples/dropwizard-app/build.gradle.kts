@@ -30,7 +30,6 @@ val execTask by tasks.register("start", JavaExec::class) {
     dependsOn("jar")
     classpath = sourceSets.main.get().runtimeClasspath
     jvmArgs = listOf(
-            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
             "-javaagent:${rootProject.projectDir}/lib/newrelic.jar"
     )
     main = "com.newrelic.testapps.dropwizard.Main"
