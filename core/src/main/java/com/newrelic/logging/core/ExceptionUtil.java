@@ -17,12 +17,16 @@ public class ExceptionUtil {
     }
 
     public static String getErrorStack(StackTraceElement[] stack) {
+        return getErrorStack(stack, MAX_STACK_SIZE);
+    }
+
+    public static String getErrorStack(StackTraceElement[] stack, Integer maxStackSize) {
         if (stack == null || stack.length == 0) {
             return null;
         }
 
-        StringBuilder stackBuilder = new StringBuilder();
-        for(int i = 0; i < Math.min(MAX_STACK_SIZE, stack.length); i++) {
+        StringBuilder stackBuilder = new StringBuilder(maxStackSize);
+        for(int i = 0; i < Math.min(maxStackSize, stack.length); i++) {
             stackBuilder.append("  at " + stack[i].toString() + "\n");
         }
         return stackBuilder.toString();
