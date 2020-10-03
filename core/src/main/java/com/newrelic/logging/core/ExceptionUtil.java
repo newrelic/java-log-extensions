@@ -25,7 +25,7 @@ public class ExceptionUtil {
             return null;
         }
 
-        StringBuilder stackBuilder = new StringBuilder(maxStackSize);
+        StringBuilder stackBuilder = new StringBuilder();
         for(int i = 0; i < Math.min(maxStackSize, stack.length); i++) {
             stackBuilder.append("  at " + stack[i].toString() + "\n");
         }

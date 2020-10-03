@@ -32,7 +32,7 @@ import static com.newrelic.logging.core.ExceptionUtil.MAX_STACK_SIZE;
 public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     private NewRelicJsonLayout layout;
 
-    Integer maxStackSize = MAX_STACK_SIZE;
+    private Integer maxStackSize = MAX_STACK_SIZE;
 
     @Override
     public byte[] encode(ILoggingEvent event) {
@@ -51,6 +51,10 @@ public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
         super.start();
         layout = new NewRelicJsonLayout(maxStackSize);
         layout.start();
+    }
+
+    public void setMaxStackSize(final Integer maxStackSize) {
+        this.maxStackSize = maxStackSize;
     }
 
     @Override
