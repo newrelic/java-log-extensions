@@ -27,7 +27,7 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     public String doLayout(ILoggingEvent event) {
         StringWriter sw = new StringWriter();
 
-        try (JsonGenerator generator = new JsonFactory().createGenerator(sw)) {
+        try (JsonGenerator generator = JsonFactoryProvider.getInstance().createGenerator(sw)) {
             writeToGenerator(event, generator);
         } catch (Throwable ignored) {
             return event.getFormattedMessage();
