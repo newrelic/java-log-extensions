@@ -22,6 +22,16 @@ import java.util.Map;
 import static com.newrelic.logging.core.ExceptionUtil.MAX_STACK_SIZE;
 
 public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
+    private final Integer maxStackSize;
+
+    public NewRelicJsonLayout() {
+        this(MAX_STACK_SIZE);
+    }
+
+    public NewRelicJsonLayout(Integer maxStackSize) {
+        this.maxStackSize = maxStackSize;
+    }
+
     @Override
     public String doLayout(ILoggingEvent event) {
         StringWriter sw = new StringWriter();
@@ -66,12 +76,12 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
 
             StackTraceElementProxy[] stackProxy = proxy.getStackTraceElementProxyArray();
             if (stackProxy != null && stackProxy.length > 0) {
-                List<StackTraceElement> elements = new ArrayList<>(MAX_STACK_SIZE);
-                for (int i = 0; i < MAX_STACK_SIZE && i < stackProxy.length; i++) {
+                List<StackTraceElement> elements = new ArrayList<>(maxStackSize);
+                for (int i = 0; i < maxStackSize && i < stackProxy.length; i++) {
                     elements.add(stackProxy[i].getStackTraceElement());
                 }
 
-                generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(elements.toArray(new StackTraceElement[0])));
+                generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(elements.toArray(new StackTraceElement[0]), maxStackSize));
             }
         }
 
