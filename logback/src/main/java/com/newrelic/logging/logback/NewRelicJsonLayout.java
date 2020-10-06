@@ -9,7 +9,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.LayoutBase;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
 import com.newrelic.logging.core.ExceptionUtil;
@@ -27,7 +26,7 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     public String doLayout(ILoggingEvent event) {
         StringWriter sw = new StringWriter();
 
-        try (JsonGenerator generator = new JsonFactory().createGenerator(sw)) {
+        try (JsonGenerator generator = JsonFactoryProvider.getInstance().createGenerator(sw)) {
             writeToGenerator(event, generator);
         } catch (Throwable ignored) {
             return event.getFormattedMessage();
