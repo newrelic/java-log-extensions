@@ -92,11 +92,9 @@ class NewRelicLogbackTests {
     void shouldAppendCustomArgsToJsonCorrectly() throws Throwable {
         givenMockAgentData();
         givenARedirectedAppender();
-        givenALoggingEventWithCallerData();
         givenALoggingEventWithCustomArgs();
         whenTheEventIsAppended();
         thenJsonLayoutWasUsed();
-        thenTheCallerDataIsInTheMessage();
         thenTheCustomArgsAreInTheMessage();
     }
 
