@@ -76,7 +76,6 @@ class NewRelicLogbackTests {
         thenTheCallerDataIsInTheMessage();
     }
 
-
     @Test
     @Timeout(3)
     void shouldAppendErrorDataCorrectly() throws Throwable {
@@ -86,6 +85,17 @@ class NewRelicLogbackTests {
         whenTheEventIsAppended();
         thenJsonLayoutWasUsed();
         thenTheExceptionDataIsInTheMessage();
+    }
+
+    @Test
+    @Timeout(3)
+    void shouldAppendCustomArgsToJsonCorrectly() throws Throwable {
+        givenMockAgentData();
+        givenARedirectedAppender();
+        givenALoggingEventWithCustomArgs();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheCustomArgsAreInTheMessage();
     }
 
     private void givenMockAgentData() {
@@ -112,6 +122,16 @@ class NewRelicLogbackTests {
     private void givenALoggingEventWithCallerData() {
         givenALoggingEvent();
         event.setCallerData(new StackTraceElement[] { new Exception().getStackTrace()[0] });
+    }
+
+    private void givenALoggingEventWithCustomArgs() {
+        givenALoggingEvent();
+        CustomArgument customArgument1 = new CustomArgument("customKey1", "customValue1");
+        CustomArgument customArgument2 = new CustomArgument("customKey2", "customValue2");
+        Object[] customArgs = new Object[2];
+        customArgs[0] = customArgument1;
+        customArgs[1] = customArgument2;
+        event.setArgumentArray(customArgs);
     }
 
     private void givenARedirectedAppender() {
@@ -169,6 +189,13 @@ class NewRelicLogbackTests {
                         "error.class", "java.lang.Exception",
                         "error.stack", Pattern.compile(".*NewRelicLogbackTests\\.shouldAppendErrorDataCorrectly.*", Pattern.DOTALL),
                         "error.message", "~~ oops ~~")
+        );
+    }
+
+    private void thenTheCustomArgsAreInTheMessage() throws Throwable {
+        LogAsserts.assertFieldValues(
+                getOutput(),
+                ImmutableMap.of("customKey1", "customValue1", "customKey2", "customValue2")
         );
     }
 

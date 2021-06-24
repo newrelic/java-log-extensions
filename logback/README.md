@@ -55,3 +55,12 @@ in the previous step.
        <appender-ref ref="ASYNC" />
    </root>
 ```
+
+## Adding Custom Arguments to JSON Log
+
+As of `com.newrelic.logging:logback:2.3` you can add custom arguments in the JSON log for logback as follows:
+
+```
+import static com.newrelic.logging.logback.CustomArgument.keyValue;
+logger.info("Custom log", keyValue("customKey", "customValue"));
+```
