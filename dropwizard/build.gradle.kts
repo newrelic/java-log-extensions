@@ -24,7 +24,7 @@ dependencies {
     implementation("io.dropwizard:dropwizard-request-logging:1.3.14")
     implementation("javax.servlet:javax.servlet-api:3.1.0")
 
-    implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
+    implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
     includeInJar(project(":logback")) {
         isTransitive = false
     }

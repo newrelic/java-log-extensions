@@ -21,10 +21,10 @@ val includeInJar: Configuration by configurations.creating
 configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
-    annotationProcessor("org.apache.logging.log4j:log4j-core:2.13.3")
+    annotationProcessor("org.apache.logging.log4j:log4j-core:2.16.0")
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.13.3")
-    implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.16.0")
+    implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
     includeInJar(project(":core"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")

@@ -12,7 +12,7 @@ repositories {
 dependencies {
     implementation("io.dropwizard:dropwizard-core:1.3.14")
     implementation(project(":dropwizard"))
-    implementation("com.newrelic.agent.java:newrelic-api:5.6.0")
+    implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
 }
 
 configure<JavaPluginConvention> {
