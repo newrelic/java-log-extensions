@@ -24,6 +24,9 @@ dependencies {
     implementation("ch.qos.logback:logback-core:1.2.0")
     implementation("ch.qos.logback:logback-classic:1.2.0")
     implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
+    implementation("com.newrelic.telemetry:telemetry-core:0.12.0")
+
+    includeInJar(project(":forwarder"))
     includeInJar(project(":core"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")

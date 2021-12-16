@@ -15,6 +15,13 @@
     </Match>
     <Match>
         <!--
+          This is not final so that it can be reassigned in tests to inject a mock Agent.
+        -->
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <Class name="com.newrelic.logging.logback.NewRelicHttpAppender"/>
+    </Match>
+    <Match>
+        <!--
           We have to write to a static because otherwise this value is set based on a classload.
         -->
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
