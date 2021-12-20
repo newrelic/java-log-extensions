@@ -17,7 +17,7 @@ repositories {
 }
 
 val includeInJar: Configuration by configurations.creating
-configurations["compile"].extendsFrom(includeInJar)
+configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
@@ -32,7 +32,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     testImplementation("com.google.guava:guava:29.0-jre")
     testImplementation("org.mockito:mockito-core:3.4.4")
+    testImplementation(project(":core"))
     testImplementation(project(":core-test"))
+    testImplementation(project(":forwarder"))
 }
 
 val jar by tasks.getting(Jar::class) {
