@@ -17,7 +17,7 @@ repositories {
 }
 
 val includeInJar: Configuration by configurations.creating
-configurations["compileOnly"].extendsFrom(includeInJar)
+configurations["compile"].extendsFrom(includeInJar)
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
