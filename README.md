@@ -10,7 +10,7 @@ For the latest information, please see the [New Relic Documentation](https://doc
 We support:
 
 * [java.util.logging](jul/README.md)
-* [Apache Log4j 2.x](log4j2/README.md)
+* [Apache Log4j 2.13.2 or higher](log4j2/README.md)
 * [Apache Log4j 1.x](log4j1/README.md)
 * [Logback 1.2](logback/README.md)
 * [Logback 1.1](logback11/README.md)

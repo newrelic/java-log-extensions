@@ -2,7 +2,7 @@
 
 ## Preconditions
 
-1. log4j 2.x must be configured and working in the application.
+1. log4j 2.13.2 or higher must be configured and working in the application.
 2. The New Relic Java agent must be enabled using the `-javaagent` command-line parameter.
 3. You must be using at least version 5.6.0 of the Java Agent.
 
