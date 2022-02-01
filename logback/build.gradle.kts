@@ -23,7 +23,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("ch.qos.logback:logback-core:1.2.0")
     implementation("ch.qos.logback:logback-classic:1.2.0")
-    implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
+    implementation("com.newrelic.agent.java:newrelic-api:7.4.3")
     includeInJar(project(":core"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
