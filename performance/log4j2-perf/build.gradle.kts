@@ -16,7 +16,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.16.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.11.1")
     implementation("com.lmax:disruptor:3.4.2")
-    implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
+    implementation("com.newrelic.agent.java:newrelic-api:7.4.3")
 }
 
 

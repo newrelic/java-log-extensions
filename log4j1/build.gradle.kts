@@ -22,7 +22,7 @@ configurations["compileOnly"].extendsFrom(includeInJar)
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("log4j:log4j:1.2.17")
-    implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
+    implementation("com.newrelic.agent.java:newrelic-api:7.4.3")
     includeInJar(project(":core"))
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")

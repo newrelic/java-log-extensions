@@ -16,7 +16,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.1.1")
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
 
-    implementation("com.newrelic.agent.java:newrelic-api:7.4.2")
+    implementation("com.newrelic.agent.java:newrelic-api:7.4.3")
 }
 
 
