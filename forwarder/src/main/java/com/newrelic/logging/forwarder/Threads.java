@@ -1,7 +1,8 @@
 /*
- * Copyright 2019 New Relic Corporation. All rights reserved.
+ * Copyright 2022 New Relic Corporation. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
+
 package com.newrelic.logging.forwarder;
 
 import java.util.concurrent.ConcurrentHashMap;

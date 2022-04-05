@@ -1,7 +1,8 @@
 /*
- * Copyright 2019 New Relic Corporation. All rights reserved.
+ * Copyright 2022 New Relic Corporation. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
+
 package com.newrelic.logging.forwarder;
 
 public class LogForwarderConfiguration {
@@ -30,13 +31,19 @@ public class LogForwarderConfiguration {
     /**
      * Maximum scheduled logs to be appended.
      *
-     * This is used to prevent the log forwarder of accepting more logs when we reach this
+     * This is used to prevent the log forwarder from accepting more logs when we reach this
      * number of jobs in the scheduler.
      */
     private final int maxScheduledLogsToBeAppended;
 
+    /**
+     * Time period and initial delay when scheduling a task at a fixed rate.
+     */
     private final int flushIntervalSeconds;
 
+    /**
+     * Number of seconds to wait for graceful shutdown of its executor.
+     */
     private final int maxTerminationTimeSeconds;
 
     private LogForwarderConfiguration(Builder builder) {

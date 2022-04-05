@@ -16,7 +16,6 @@ Logback Extension. All steps are required.
 Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:logback) for the appropriate snippets.
 
 ### 2. Configure a `logback appender` element with a `NewRelicEncoder` or a `NewRelicHttpAppender` if you want to send
-logs without an external log forwarder.
 
 #### Using an external log forwarder like the infra-agent (fluent-bit), fluentd or others.
 
@@ -51,8 +50,7 @@ external log forwarders is not an option. For that you should configure the `New
     </appender>
 ```
 
-The license will be picked up from the java-agent if installed, but you can override it if you want.
-The endpoint need to be set for other cases different to NewRelic US endpoint, which is the default.
+See the [forwarder README](../forwarder/README.md#configuration) for a full description of the `NewRelicHttpAppender` config properties shown above.
 
 ### 3. `NewRelicAsyncAppender` must wrap any appenders that will target New Relic's log forwarder
 
