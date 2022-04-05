@@ -5,7 +5,7 @@ A log forwarder built using the [New Relic Java Telemetry SDK](https://github.co
 ## Usage 
 
 The `forwarder` module is currently used by the following:
-* [Logback 1.2](../logback/README.md) - See `NewRelicHttpAppender`
+* [Logback 1.2](../logback/README.md#using-the-http-log-forwarder-from-within-your-app) - See `NewRelicHttpAppender`
 
 ## Configuration
 
