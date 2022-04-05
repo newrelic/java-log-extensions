@@ -13,10 +13,10 @@ repositories {
 dependencies {
     implementation(project(":log4j2"))
 
-    implementation("org.apache.logging.log4j:log4j-api:2.16.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.17.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.11.1")
     implementation("com.lmax:disruptor:3.4.2")
-    implementation("com.newrelic.agent.java:newrelic-api:7.4.3")
+    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
 }
 
 
