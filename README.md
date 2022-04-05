@@ -10,7 +10,8 @@ For the latest information, please see the [New Relic Documentation](https://doc
 We support:
 
 * [java.util.logging](jul/README.md)
-* [Apache Log4j 2.x](log4j2/README.md)
+* [Apache Log4j 2.13.2 or higher](log4j2/README.md)
+  * We strongly suggest that log4j 2.15.x or higher be used to avoid [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228)
 * [Apache Log4j 1.x](log4j1/README.md)
 * [Logback 1.2](logback/README.md)
 * [Logback 1.1](logback11/README.md)
