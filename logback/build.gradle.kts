@@ -23,13 +23,18 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("ch.qos.logback:logback-core:1.2.0")
     implementation("ch.qos.logback:logback-classic:1.2.0")
-    implementation("com.newrelic.agent.java:newrelic-api:7.4.3")
+    implementation("com.newrelic.telemetry:telemetry-core:0.13.1")
+    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
+
+    includeInJar(project(":forwarder"))
     includeInJar(project(":core"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     testImplementation("com.google.guava:guava:29.0-jre")
     testImplementation("org.mockito:mockito-core:3.4.4")
+    testImplementation(project(":core"))
     testImplementation(project(":core-test"))
+    testImplementation(project(":forwarder"))
 }
 
 val jar by tasks.getting(Jar::class) {

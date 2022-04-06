@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     implementation(project(":jul"))
-    implementation("com.newrelic.agent.java:newrelic-api:7.4.3")
+    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
 }
 
 
