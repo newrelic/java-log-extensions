@@ -41,7 +41,7 @@ import com.newrelic.logging.core.ElementName;
  *     <root>
  * }</pre>
  * <p>
- * For more configuration/parameter options {@see LogForwarderConfiguration} class and add them to your appender as for
+ * For more configuration/parameter options @see LogForwarderConfiguration class and add them to your appender as for
  * example:
  *
  * <pre>{@code
