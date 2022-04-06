@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.4.0
+- Add a `forwarder` module that does log forwarding using the [New Relic Java Telemetry SDK](https://github.com/newrelic/newrelic-telemetry-sdk-java)
+- Implement `com.newrelic.logging.logback.NewRelicHttpAppender` to do log forwarding for logback
+- Update `log4j2` dependencies to version `2.17.2`
+- Update Java agent API dependencies to version `7.6.0`
+
 ## 2.3.2
 - Update documentation to specify support for Log4J 2.13.2 or higher
 - Add warning for CVE-2021-44228
