@@ -28,11 +28,11 @@ import java.util.logging.LogRecord;
  */
 public class NewRelicFormatter extends Formatter {
     @Override
-    public String format(LogRecord record) {
+    public String format(LogRecord logRecord) {
         StringWriter sw = new StringWriter();
 
         try (JsonGenerator generator = new JsonFactory().createGenerator(sw)) {
-            writeToGenerator(record, generator);
+            writeToGenerator(logRecord, generator);
         } catch (IOException e) {
             return e.toString();
         }

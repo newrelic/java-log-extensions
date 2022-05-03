@@ -10,15 +10,15 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation(project(":jul"))
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
-
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+dependencies {
+    implementation(project(":jul"))
+    implementation("com.newrelic.agent.java:newrelic-api:_")
 }
 
 application {

@@ -9,15 +9,16 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("io.dropwizard:dropwizard-core:1.3.14")
-    implementation(project(":dropwizard"))
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+dependencies {
+    implementation("io.dropwizard:dropwizard-core:_")
+    implementation(project(":dropwizard"))
+    implementation("com.newrelic.agent.java:newrelic-api:_")
 }
 
 val jar by tasks.getting(Jar::class) {

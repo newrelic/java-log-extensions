@@ -10,19 +10,19 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation(project(":logback"))
-    implementation("ch.qos.logback:logback-core:1.2.3")
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
-
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
+dependencies {
+    implementation(project(":logback"))
+    implementation("ch.qos.logback:logback-core:_")
+    implementation("ch.qos.logback:logback-classic:_")
+    implementation("com.fasterxml.jackson.core:jackson-core:_")
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    implementation("com.newrelic.agent.java:newrelic-api:_")
 }
 
 application {

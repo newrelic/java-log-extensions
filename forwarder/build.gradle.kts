@@ -9,14 +9,20 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
-    implementation("com.newrelic.telemetry:telemetry-core:0.13.1")
-    implementation("com.newrelic.telemetry:telemetry-http-okhttp:0.13.1")
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
-    testImplementation("org.mockito:mockito-core:3.4.4")
-    testImplementation("ch.qos.logback:logback-classic:1.2.3")
+dependencies {
+    implementation("com.newrelic.agent.java:newrelic-api:_")
+    implementation("com.newrelic.telemetry:telemetry-core:_")
+    implementation("com.newrelic.telemetry:telemetry-http-okhttp:_")
+
+    testImplementation(Testing.junit.jupiter)
+    testImplementation(Testing.mockito.core)
+    testImplementation("ch.qos.logback:logback-classic:_")
     testImplementation(project(":core-test"))
 }
 

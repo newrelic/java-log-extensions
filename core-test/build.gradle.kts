@@ -9,13 +9,14 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("org.junit.jupiter:junit-jupiter:5.6.2")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
-    implementation(project(":core"))
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+dependencies {
+    implementation(Testing.junit.jupiter)
+    implementation("com.fasterxml.jackson.core:jackson-core:_")
+    implementation(project(":core"))
 }

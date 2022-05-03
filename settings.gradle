@@ -1,3 +1,16 @@
+pluginManagement {
+    repositories {
+        maven { url = uri("https://repo.spring.io/milestone") }
+        maven { url = uri("https://repo.spring.io/release") }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id("de.fayard.refreshVersions") version "0.40.1"
+}
+
 rootProject.name = 'log-extensions'
 include 'log4j1'
 include 'log4j2'
@@ -17,4 +30,3 @@ include 'examples:jul-app'
 include 'examples:dropwizard-app'
 
 include 'performance:log4j2-perf'
-

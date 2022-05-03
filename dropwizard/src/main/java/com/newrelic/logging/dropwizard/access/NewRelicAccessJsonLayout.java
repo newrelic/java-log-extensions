@@ -24,8 +24,8 @@ public class NewRelicAccessJsonLayout extends LayoutBase<IAccessEvent> {
 
         try (JsonGenerator generator = new JsonFactory().createGenerator(sw)) {
             writeToGenerator(event, generator);
-        } catch (Throwable throwable) {
-            sw.append(throwable.getMessage());
+        } catch (Exception exception) {
+            sw.append(exception.getMessage());
         }
 
         sw.append('\n');
