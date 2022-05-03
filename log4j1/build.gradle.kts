@@ -12,7 +12,6 @@ version = releaseVersion + if ("true" == release) "" else "-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven(url = "https://dl.bintray.com/mockito/maven/")
 }
 
 val includeInJar: Configuration by configurations.creating
@@ -25,14 +24,14 @@ java {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-core:2.13.2")
-    implementation("log4j:log4j:1.2.17")
-    implementation("com.newrelic.agent.java:newrelic-api:7.7.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:_")
+    implementation("log4j:log4j:_")
+    implementation("com.newrelic.agent.java:newrelic-api:_")
     includeInJar(project(":core"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    testImplementation("com.google.guava:guava:31.1-jre")
-    testImplementation("org.mockito:mockito-core:4.5.1")
+    testImplementation(Testing.junit.jupiter.api)
+    testImplementation("com.google.guava:guava:_")
+    testImplementation(Testing.mockito.core)
     testImplementation(project(":core"))
     testImplementation(project(":core-test"))
 }

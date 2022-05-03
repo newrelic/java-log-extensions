@@ -18,7 +18,7 @@ java {
 
 dependencies {
     implementation(project(":jul"))
-    implementation("com.newrelic.agent.java:newrelic-api:7.7.0")
+    implementation("com.newrelic.agent.java:newrelic-api:_")
 }
 
 application {

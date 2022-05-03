@@ -16,13 +16,13 @@ java {
 }
 
 dependencies {
-    implementation("com.newrelic.agent.java:newrelic-api:7.7.0")
-    implementation("com.newrelic.telemetry:telemetry-core:0.13.1")
-    implementation("com.newrelic.telemetry:telemetry-http-okhttp:0.13.1")
+    implementation("com.newrelic.agent.java:newrelic-api:_")
+    implementation("com.newrelic.telemetry:telemetry-core:_")
+    implementation("com.newrelic.telemetry:telemetry-http-okhttp:_")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testImplementation("org.mockito:mockito-core:4.5.1")
-    testImplementation("ch.qos.logback:logback-classic:1.2.11")
+    testImplementation(Testing.junit.jupiter)
+    testImplementation(Testing.mockito.core)
+    testImplementation("ch.qos.logback:logback-classic:_")
     testImplementation(project(":core-test"))
 }
 

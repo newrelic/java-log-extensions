@@ -16,7 +16,7 @@ java {
 }
 
 dependencies {
-    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.13.2")
+    implementation(Testing.junit.jupiter)
+    implementation("com.fasterxml.jackson.core:jackson-core:_")
     implementation(project(":core"))
 }

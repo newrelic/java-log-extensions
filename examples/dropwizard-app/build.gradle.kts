@@ -16,9 +16,9 @@ java {
 }
 
 dependencies {
-    implementation("io.dropwizard:dropwizard-core:1.3.14")
+    implementation("io.dropwizard:dropwizard-core:_")
     implementation(project(":dropwizard"))
-    implementation("com.newrelic.agent.java:newrelic-api:7.7.0")
+    implementation("com.newrelic.agent.java:newrelic-api:_")
 }
 
 val jar by tasks.getting(Jar::class) {
