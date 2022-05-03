@@ -10,6 +10,7 @@ import ch.qos.logback.core.encoder.EncoderBase;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -29,25 +30,7 @@ import java.util.Arrays;
  * @see <a href="https://logback.qos.ch/manual/encoders.html#interface">Logback Encoders</a>
  */
 public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
-    private NewRelicJsonLayout layout = new NewRelicJsonLayout();
-
-    @Override
-    public void doEncode(ILoggingEvent event) throws IOException {
-        String laidOutResult = layout.doLayout(event);
-        ByteBuffer results = StandardCharsets.UTF_8.encode(laidOutResult);
-        byte[] resultArray = results.array();
-        int i = resultArray.length - 1;
-        while (i > 0 && resultArray[i - 1] == '\0') {
-            i--;
-        }
-
-        try {
-            super.outputStream.write(Arrays.copyOfRange(resultArray, 0, i));
-            super.outputStream.flush();
-        } catch (IOException e) {
-            addWarn("Error encountered while writing log event. Event: " + event, e);
-        }
-    }
+    private final NewRelicJsonLayout layout = new NewRelicJsonLayout();
 
     @Override
     public void start() {
@@ -56,6 +39,18 @@ public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     }
 
     @Override
-    public void close() throws IOException {
+    public byte[] headerBytes() {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] encode(ILoggingEvent event) {
+        String txt = layout.doLayout(event);
+        return txt.getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public byte[] footerBytes() {
+        return new byte[0];
     }
 }

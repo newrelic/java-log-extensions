@@ -1,6 +1,5 @@
 plugins {
     java
-    id("com.github.spotbugs").version("4.4.4")
 }
 
 group = "com.newrelic.logging"
@@ -19,19 +18,25 @@ repositories {
 val includeInJar: Configuration by configurations.creating
 configurations["compileOnly"].extendsFrom(includeInJar)
 
-dependencies {
-    implementation("io.dropwizard:dropwizard-logging:1.3.14")
-    implementation("io.dropwizard:dropwizard-request-logging:1.3.14")
-    implementation("javax.servlet:javax.servlet-api:3.1.0")
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
 
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
+dependencies {
+    implementation("io.dropwizard:dropwizard-logging:2.0.29")
+    implementation("io.dropwizard:dropwizard-request-logging:2.0.29")
+    implementation("javax.servlet:javax.servlet-api:4.0.1")
+
+    implementation("com.newrelic.agent.java:newrelic-api:7.7.0")
     includeInJar(project(":logback")) {
         isTransitive = false
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
-    testImplementation("org.mockito:mockito-core:3.4.4")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.4.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.mockito:mockito-core:4.5.1")
+    testImplementation("org.mockito:mockito-junit-jupiter:4.5.1")
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation(project(":logback"))
 }
@@ -49,11 +54,6 @@ tasks.withType<Javadoc> {
     enabled = true
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 tasks.register<Jar>("sourcesJar") {
     from(sourceSets.main.get().allJava)
     archiveClassifier.set("sources")
@@ -65,9 +65,3 @@ tasks.register<Jar>("javadocJar") {
 }
 
 apply(from = "$rootDir/gradle/publish.gradle.kts")
-
-tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
-    reports.create("html") {
-        isEnabled = true
-    }
-}

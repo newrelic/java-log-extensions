@@ -10,6 +10,12 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.17.2")
     implementation("org.apache.logging.log4j:log4j-core:2.17.2")
@@ -17,13 +23,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("com.lmax:disruptor:3.4.2")
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
-}
-
-
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    implementation("com.newrelic.agent.java:newrelic-api:7.7.0")
 }
 
 application {

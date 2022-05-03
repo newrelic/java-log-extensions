@@ -1,6 +1,5 @@
 plugins {
     java
-    id("com.github.spotbugs").version("4.4.4")
 }
 
 group = "com.newrelic.logging"
@@ -20,16 +19,22 @@ repositories {
 val includeInJar: Configuration by configurations.creating
 configurations["compileOnly"].extendsFrom(includeInJar)
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 dependencies {
     annotationProcessor("org.apache.logging.log4j:log4j-core:2.17.2")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.13.2")
     implementation("org.apache.logging.log4j:log4j-core:2.17.2")
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
+    implementation("com.newrelic.agent.java:newrelic-api:7.7.0")
     includeInJar(project(":core"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
-    testImplementation("com.google.guava:guava:29.0-jre")
-    testImplementation("org.mockito:mockito-core:3.4.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("com.google.guava:guava:31.1-jre")
+    testImplementation("org.mockito:mockito-core:4.5.1")
     testImplementation(project(":core"))
     testImplementation(project(":core-test"))
 }
@@ -48,11 +53,6 @@ tasks.withType<Javadoc> {
     (options as? CoreJavadocOptions)?.addStringOption("link", "https://logging.apache.org/log4j/2.x/log4j-api/apidocs/")
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 tasks.register<Jar>("sourcesJar") {
     from(sourceSets.main.get().allJava)
     archiveClassifier.set("sources")
@@ -64,9 +64,3 @@ tasks.register<Jar>("javadocJar") {
 }
 
 apply(from = "$rootDir/gradle/publish.gradle.kts")
-
-tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
-    reports.create("html") {
-        isEnabled = true
-    }
-}
