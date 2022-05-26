@@ -54,6 +54,10 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             }
         }
 
+        if (event.getMarker() != null) {
+            generator.writeStringField(ElementName.MARKER, event.getMarker().getName());
+        }
+
         generator.writeEndObject();
     }
 }

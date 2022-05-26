@@ -6,6 +6,7 @@ package com.newrelic.logging.core;
 
 public class ElementName {
     public static final String MESSAGE = "message";
+    public static final String MARKER = "marker";
     public static final String TIMESTAMP = "timestamp";
     public static final String THREAD_NAME = "thread.name";
     public static final String LOG_LEVEL = "log.level";
