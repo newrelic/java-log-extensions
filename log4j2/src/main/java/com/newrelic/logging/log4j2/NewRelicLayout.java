@@ -78,10 +78,32 @@ public class NewRelicLayout extends AbstractStringLayout {
 
         Map<String, String> map = event.getContextData().toMap();
         if (map != null) {
+
+            Map<String, Set<String>> multiValueMap = new HashMap<>();
+
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                if (entry.getKey().startsWith(NewRelicContextDataProvider.NEW_RELIC_PREFIX)) {
-                    String key = entry.getKey().substring(NewRelicContextDataProvider.NEW_RELIC_PREFIX.length());
-                    generator.writeStringField(key , entry.getValue());
+
+                String key = entry.getKey().startsWith(NewRelicContextDataProvider.NEW_RELIC_PREFIX)
+                        ? entry.getKey().substring(NewRelicContextDataProvider.NEW_RELIC_PREFIX.length())
+                        : entry.getKey();
+
+                multiValueMap.computeIfAbsent(key, k -> new HashSet<>())
+                             .add(entry.getValue());
+            }
+
+            for (Map.Entry<String, Set<String>> entry : multiValueMap.entrySet()) {
+
+                String[] values = entry.getValue().toArray(new String[0]);
+
+                if (values.length > 1) {
+
+                    generator.writeArrayFieldStart(entry.getKey());
+                    generator.writeArray(values, 0, values.length);
+                    generator.writeEndArray();
+
+                } else {
+
+                    generator.writeStringField(entry.getKey(), values[0]);
                 }
             }
         }
