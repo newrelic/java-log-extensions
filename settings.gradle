@@ -7,7 +7,6 @@ include 'jul'
 include 'dropwizard'
 include 'core'
 include 'core-test'
-include 'forwarder'
 
 include 'examples:log4j1-app'
 include 'examples:log4j2-app'
@@ -17,4 +16,3 @@ include 'examples:jul-app'
 include 'examples:dropwizard-app'
 
 include 'performance:log4j2-perf'
-
