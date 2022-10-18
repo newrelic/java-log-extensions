@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.6.0
+* Removed the log forwarder. Please use the [New Relic Java Agent](https://github.com/newrelic/newrelic-java-agent) if you want log forwarding to be used.
+* Upgrade Gradle to version 7.5.1
+
 ## 2.5.0
 * Add logback marker to JSON layout if present
 * Update to TelemetrySDK 0.13.2 to address [CVE-2022-25647](https://github.com/advisories/GHSA-4jrv-ppp4-jm57)
