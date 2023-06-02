@@ -6,7 +6,7 @@
 package com.newrelic.logging.core;
 
 public class ExceptionUtil {
-    public static final int MAX_STACK_SIZE = 10;
+    public static final int MAX_STACK_SIZE = 300;
     public static String getErrorStack(Throwable throwable) {
         if (throwable == null) {
             return null;
@@ -27,7 +27,7 @@ public class ExceptionUtil {
 
         StringBuilder stackBuilder = new StringBuilder();
         for(int i = 0; i < Math.min(maxStackSize, stack.length); i++) {
-            stackBuilder.append("  at " + stack[i].toString() + "\n");
+            stackBuilder.append("  at ").append(stack[i].toString()).append("\n");
         }
         return stackBuilder.toString();
     }
