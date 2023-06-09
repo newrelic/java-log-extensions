@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
+
 /**
  * A {@link Layout} that writes the New Relic JSON format.
  * <p>
@@ -120,7 +122,7 @@ public class NewRelicLayout extends AbstractStringLayout {
                 String key = entry.getKey().substring(NewRelicContextDataProvider.NEW_RELIC_PREFIX.length());
                 multiValueMap.computeIfAbsent(key, k -> new HashSet<>()).add(entry.getValue());
             } else if (LogExtensionConfig.shouldAddMDC()) {
-                multiValueMap.computeIfAbsent(entry.getKey(), k -> new HashSet<>()).add(entry.getValue());
+                multiValueMap.computeIfAbsent(CONTEXT_PREFIX + entry.getKey(), k -> new HashSet<>()).add(entry.getValue());
             }
         }
         return multiValueMap;

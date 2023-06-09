@@ -30,6 +30,9 @@ environment variable (`NEW_RELIC_LOG_EXTENSION_ADD_MDC=boolean`) or system prope
 
 Note that, if set to `true` all MDC data will be added to log events. Currently, there is no filtering capability for excluding specific MDC entries.
 
+MDC data will be added to log events with a `context.` prefix to distinguish it as user defined context data as well as to prevent potential
+collisions with New Relic specific context keys.
+
 ### Exception Stack Trace Size
 You can configure the logging extension to control the max stack trace size for exceptions added to log events.
 

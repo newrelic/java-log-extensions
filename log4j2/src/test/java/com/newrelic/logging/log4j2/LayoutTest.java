@@ -24,6 +24,12 @@ import static com.newrelic.logging.core.LogExtensionConfig.ADD_MDC_SYS_PROP;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LayoutTest {
+    @BeforeEach
+    void cleanup() {
+        // Clear out MDC before each test
+        ThreadContext.clearAll();
+    }
+
     @Test
     void shouldLayoutStandardMessage() {
         NewRelicLayout target = NewRelicLayout.factory();
@@ -100,8 +106,6 @@ class LayoutTest {
                         + "\"some.key\":\"some.value\""
                         + "}\\n"
         ));
-
-        ThreadContext.clearAll();
     }
 
     @Test
@@ -134,8 +138,6 @@ class LayoutTest {
                         + "\"some.key\":\"some.value\""
                         + "}\\n"
         ));
-
-        ThreadContext.clearAll();
     }
 
     @Test
@@ -165,14 +167,12 @@ class LayoutTest {
                         + "\"thread.name\":\"[^\"]+\","
                         + "\"log.level\":\"ERROR\","
                         + "\"logger.name\":\"logger-name\","
+                        + "\"context.contextKey3\":\"contextData3\","
+                        + "\"context.contextKey2\":\"contextData2\","
                         + "\"some.key\":\"some.value\","
-                        + "\"contextKey2\":\"contextData2\","
-                        + "\"contextKey3\":\"contextData3\","
-                        + "\"contextKey1\":\"contextData1\""
+                        + "\"context.contextKey1\":\"contextData1\""
                         + "}\\n"
         ));
-
-        ThreadContext.clearAll();
     }
 
     @BeforeEach

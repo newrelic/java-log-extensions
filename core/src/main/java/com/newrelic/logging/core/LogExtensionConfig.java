@@ -13,6 +13,7 @@ public class LogExtensionConfig {
     public static final String ADD_MDC_ENV_VAR = CONFIG_PREFIX_ENV_VAR + "ADD_MDC";
     public static final String ADD_MDC_SYS_PROP = CONFIG_PREFIX_SYS_PROP + "add_mdc";
     public static final boolean ADD_MDC_DEFAULT = false;
+    public static final String CONTEXT_PREFIX = "context.";
 
     /**
      * Get an int representing the max stack size for errors that should be added to logs
