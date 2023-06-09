@@ -32,6 +32,8 @@ dependencies {
     testImplementation("org.mockito:mockito-core:3.4.4")
     testImplementation(project(":core"))
     testImplementation(project(":core-test"))
+    // Allows for easy testing of values based on Environment Variables and System Properties
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
 }
 
 val jar by tasks.getting(Jar::class) {
