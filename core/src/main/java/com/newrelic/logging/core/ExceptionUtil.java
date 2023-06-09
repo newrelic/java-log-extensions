@@ -5,8 +5,10 @@
 
 package com.newrelic.logging.core;
 
+import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
+
 public class ExceptionUtil {
-    public static final int MAX_STACK_SIZE = 300;
+    public static final int MAX_STACK_SIZE_DEFAULT = 300;
     public static String getErrorStack(Throwable throwable) {
         if (throwable == null) {
             return null;
@@ -17,7 +19,7 @@ public class ExceptionUtil {
     }
 
     public static String getErrorStack(StackTraceElement[] stack) {
-        return getErrorStack(stack, MAX_STACK_SIZE);
+        return getErrorStack(stack, getMaxStackSize());
     }
 
     public static String getErrorStack(StackTraceElement[] stack, Integer maxStackSize) {

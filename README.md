@@ -18,6 +18,25 @@ We support:
 * [Logback 1.1](logback11/README.md)
 * [Dropwizard 1.3](dropwizard/README.md)
 
+## Configuration Options
+The following config options apply to all supported logging frameworks.
+
+### Mapped Diagnostic Context (MDC)
+Not all logging frameworks provide an MDC mechanism (e.g. JUL) but for those that do you can configure
+the logging extension to add the MDC data in addition to the trace context data from New Relic.
+
+Default for adding MDC is `false`, change this to `true` if you wish to include MDC data on log events. It can be configured by
+environment variable (`NEW_RELIC_LOG_EXTENSION_ADD_MDC=boolean`) or system property (`-Dnewrelic.log_extension.add_mdc=boolean`).
+
+Note that, if set to `true` all MDC data will be added to log events. Currently, there is no filtering capability for excluding specific MDC entries.
+
+### Exception Stack Trace Size
+You can configure the logging extension to control the max stack trace size for exceptions added to log events.
+
+Default max stack trace size is `300`. It is recommended that you do not exceed this value or data could be dropped or truncated as well as
+lead to higher log event ingest costs. Max stack trace size can be configured by environment variable (`NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=integer`)
+or system property (`-Dnewrelic.log_extension.max_stack_size=boolean`).
+
 ## Support
 
 Should you need assistance with New Relic products, you are in good hands with several diagnostic tools and support channels.

@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.newrelic.logging.core.ExceptionUtil.MAX_STACK_SIZE;
+import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
 
 public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     private final Integer maxStackSize;
 
     public NewRelicJsonLayout() {
-        this(MAX_STACK_SIZE);
+        this(getMaxStackSize());
     }
 
     public NewRelicJsonLayout(Integer maxStackSize) {
