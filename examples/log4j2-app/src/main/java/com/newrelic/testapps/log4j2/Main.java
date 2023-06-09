@@ -9,6 +9,7 @@ import com.newrelic.api.agent.Token;
 import com.newrelic.api.agent.Trace;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.LocalizedMessage;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.util.Supplier;
@@ -19,9 +20,14 @@ import java.util.ResourceBundle;
 
 public class Main {
     private static final Logger logger = LogManager.getLogger(Main.class);
-    private static ResourceBundle bundle = ResourceBundle.getBundle("propres");
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("propres");
 
     public static void main(String[] args) {
+        // Add MDC data
+        ThreadContext.put("contextKey1", "contextData1");
+        ThreadContext.put("contextKey2", "contextData2");
+        ThreadContext.put("contextKey3", "contextData3");
+
         logger.info("\uD83C\uDF89 Starting the program.");
 
         List<Thread> threads = Arrays.asList(
@@ -41,6 +47,9 @@ public class Main {
         });
 
         logger.info("Program complete.");
+
+        // Clear MDC data
+        ThreadContext.clearAll();
     }
 
     @Trace(dispatcher = true)
