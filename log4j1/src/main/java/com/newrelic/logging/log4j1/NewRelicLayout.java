@@ -8,18 +8,20 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
 import com.newrelic.logging.core.ExceptionUtil;
+import com.newrelic.logging.core.LogExtensionConfig;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.spi.ThrowableInformation;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
+import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
+
 /**
  * A {@link Layout} that writes the New Relic JSON format.
- *
+ * <p>
  * This layout must be added to an {@link Appender} via {@link org.apache.log4j.Appender#setLayout(Layout)} or properties.
  * The New Relic layout has specific fields and field names and has no customizable elements. To configure,
  * update your logging config xml like this:
@@ -43,7 +45,7 @@ public class NewRelicLayout extends Layout {
             return e.toString();
         }
 
-        return sw.toString() + "\n";
+        return sw + "\n";
     }
 
     @SuppressWarnings("unchecked") // log4j1 does not use generics, so there's an unchecked cast.
@@ -62,18 +64,21 @@ public class NewRelicLayout extends Layout {
             generator.writeObjectField(ElementName.LINE_NUMBER, event.getLocationInformation().getLineNumber());
         }
 
-        event.getProperties().forEach((key, value) -> {
-            if (value != null) {
-                try {
-                    generator.writeStringField(key.toString(), value.toString());
-                } catch (IOException ignored) {
+        // MDC is added here if enabled
+        if (LogExtensionConfig.shouldAddMDC()) {
+            event.getProperties().forEach((key, value) -> {
+                if (value != null) {
+                    try {
+                        generator.writeStringField(CONTEXT_PREFIX + key.toString(), value.toString());
+                    } catch (IOException ignored) {
+                    }
                 }
-            }
+            });
+        }
 
-        });
-
+        // NR linking metadata is added here
         if (event instanceof NewRelicLoggingEvent) {
-            ((NewRelicLoggingEvent)event).getLinkedMetadata().forEach((key, value) -> {
+            ((NewRelicLoggingEvent) event).getLinkedMetadata().forEach((key, value) -> {
                 try {
                     generator.writeStringField(key, value);
                 } catch (IOException ignored) {
@@ -103,5 +108,6 @@ public class NewRelicLayout extends Layout {
      * {@inheritDoc}
      */
     @Override
-    public void activateOptions() { }
+    public void activateOptions() {
+    }
 }

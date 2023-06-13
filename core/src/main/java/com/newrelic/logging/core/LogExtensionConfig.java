@@ -6,6 +6,7 @@
 package com.newrelic.logging.core;
 
 public class LogExtensionConfig {
+    public static final String CONTEXT_PREFIX = "context.";
     private static final String CONFIG_PREFIX_ENV_VAR = "NEW_RELIC_LOG_EXTENSION_";
     private static final String CONFIG_PREFIX_SYS_PROP = "newrelic.log_extension.";
     public static final String MAX_STACK_SIZE_ENV_VAR = CONFIG_PREFIX_ENV_VAR + "MAX_STACK_SIZE";
@@ -13,7 +14,6 @@ public class LogExtensionConfig {
     public static final String ADD_MDC_ENV_VAR = CONFIG_PREFIX_ENV_VAR + "ADD_MDC";
     public static final String ADD_MDC_SYS_PROP = CONFIG_PREFIX_SYS_PROP + "add_mdc";
     public static final boolean ADD_MDC_DEFAULT = false;
-    public static final String CONTEXT_PREFIX = "context.";
 
     /**
      * Get an int representing the max stack size for errors that should be added to logs
@@ -61,7 +61,7 @@ public class LogExtensionConfig {
      * @param val String to be evaluated as an int
      * @return true if val is an int, else false
      */
-     static boolean isInteger(String val) {
+    static boolean isInteger(String val) {
         if (val == null) {
             return false;
         }

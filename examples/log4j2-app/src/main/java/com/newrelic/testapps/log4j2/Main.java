@@ -23,6 +23,10 @@ public class Main {
     private static final ResourceBundle bundle = ResourceBundle.getBundle("propres");
 
     public static void main(String[] args) {
+        // Enable MDC collection
+        // Alternatively, this could be set using the environment variable NEW_RELIC_LOG_EXTENSION_ADD_MDC
+        System.setProperty("newrelic.log_extension.add_mdc", "true");
+
         // Add MDC data
         ThreadContext.put("contextKey1", "contextData1");
         ThreadContext.put("contextKey2", "contextData2");

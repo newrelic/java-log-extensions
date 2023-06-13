@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import static com.newrelic.logging.core.ElementName.TIMESTAMP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -30,6 +31,26 @@ public class LogAsserts {
             assertEquals(token, JsonToken.FIELD_NAME);
             String elementName = parser.getValueAsString();
             assertValueIfPresent(elementName, parser, expectedValues);
+        }
+    }
+
+    public static void assertField(String field, String result, boolean shouldExist) throws IOException {
+        assertEquals('\n', result.charAt(result.length() - 1));
+
+        try (JsonParser parser = new JsonFactory().createParser(result)) {
+            assertEquals(parser.nextToken(), JsonToken.START_OBJECT);
+
+            JsonToken token;
+            while ((token = parser.nextToken()) != JsonToken.END_OBJECT) {
+                if (token.equals(JsonToken.FIELD_NAME)) {
+                    String elementName = parser.getValueAsString();
+                    if (shouldExist && elementName.contains(field)) {
+                        assertEquals(field, elementName);
+                    } else {
+                        assertNotEquals(field, elementName);
+                    }
+                }
+            }
         }
     }
 
@@ -57,7 +78,7 @@ public class LogAsserts {
                     assertEquals(parser.getValueAsString(), expectedValue);
                     break;
                 case "java.util.regex.Pattern":
-                    Pattern pattern = (Pattern)expectedValue;
+                    Pattern pattern = (Pattern) expectedValue;
                     assertEquals(valueToken, JsonToken.VALUE_STRING);
                     assertTrue(
                             pattern.matcher(parser.getValueAsString()).matches(),
