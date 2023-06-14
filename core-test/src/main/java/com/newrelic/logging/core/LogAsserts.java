@@ -35,7 +35,7 @@ public class LogAsserts {
     }
 
     /**
-     * Assert whether a specified field exists, or not, in the resulting log attributes that are recorded.
+     * Assert whether a specified field (aka attribute key) exists, or not, in the resulting log attributes that are recorded.
      *
      * @param field String representing a field to check the existence of
      * @param result String representing the actual results to assert against
