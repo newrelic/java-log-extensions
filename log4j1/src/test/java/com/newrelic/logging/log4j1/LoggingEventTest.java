@@ -102,7 +102,9 @@ class LoggingEventTest {
 
         whenOneMessageIsConfirmedLogged();
 
-        LogAsserts.assertFieldValues(innerAppender.appendedStrings.get(0), ImmutableMap.<String, Object>builder()
+        String result = innerAppender.appendedStrings.get(0);
+
+        LogAsserts.assertFieldValues(result, ImmutableMap.<String, Object>builder()
                 .put(MESSAGE, "hello, i'm another message")
                 .put(LOGGER_NAME, "foo")
                 .put(LOG_LEVEL, "WARN")
@@ -114,13 +116,13 @@ class LoggingEventTest {
                 .build()
         );
 
-        // MDC should be disabled by default
-        LogAsserts.assertField(prefixedMdcKey, innerAppender.appendedStrings.get(0), false);
+        // MDC collection is disabled by default, key should not exist
+        LogAsserts.assertFieldExistence(prefixedMdcKey, result, false);
     }
 
     @Test
     void shouldIncludeMDCProperties() throws Exception {
-        // Explicitly enable MDC
+        // Explicitly enable MDC collection
         System.setProperty(ADD_MDC_SYS_PROP, "true");
 
         givenMockReturnsAnOpaqueValue();
@@ -135,7 +137,9 @@ class LoggingEventTest {
 
         whenOneMessageIsConfirmedLogged();
 
-        LogAsserts.assertFieldValues(innerAppender.appendedStrings.get(0), ImmutableMap.<String, Object>builder()
+        String result = innerAppender.appendedStrings.get(0);
+
+        LogAsserts.assertFieldValues(result, ImmutableMap.<String, Object>builder()
                 .put(MESSAGE, "hello, i'm another message")
                 .put(LOGGER_NAME, "foo")
                 .put(LOG_LEVEL, "WARN")
@@ -147,7 +151,8 @@ class LoggingEventTest {
                 .build()
         );
 
-        LogAsserts.assertField(prefixedMdcKey, innerAppender.appendedStrings.get(0), true);
+        // MDC collection is explicitly enabled, key should exist
+        LogAsserts.assertFieldExistence(prefixedMdcKey, result, true);
     }
 
     private void givenAppenderChainIsConfiguredForOneMessage() {

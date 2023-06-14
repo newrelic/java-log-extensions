@@ -34,7 +34,15 @@ public class LogAsserts {
         }
     }
 
-    public static void assertField(String field, String result, boolean shouldExist) throws IOException {
+    /**
+     * Assert whether a specified field exists, or not, in the resulting log attributes that are recorded.
+     *
+     * @param field String representing a field to check the existence of
+     * @param result String representing the actual results to assert against
+     * @param shouldExist boolean true if field should exist in the result, else false
+     * @throws IOException sometimes
+     */
+    public static void assertFieldExistence(String field, String result, boolean shouldExist) throws IOException {
         assertEquals('\n', result.charAt(result.length() - 1));
 
         try (JsonParser parser = new JsonFactory().createParser(result)) {
