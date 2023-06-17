@@ -35,8 +35,6 @@ See [log4j1.xml](log4j1-app/src/main/resources/log4j.xml) for the configuration.
 Run the application with `./gradlew :examples:log4j2-app:run`. The decorated log messages will be written to 
 `examples/log4j2-app/logs/log4j2.log`. See [log4j2.xml](log4j2-app/src/main/resources/log4j2.xml) for the configuration.
 
-_Optional_: Set `NEW_RELIC_LOG_EXTENSION_ADD_MDC=true` to include MDC data in the decorated `log4j2.log`
-
 ### logback
 
 Run the application with `./gradlew :examples:logback-app:run`. The decorated log messages will be written to 
@@ -45,4 +43,4 @@ Run the application with `./gradlew :examples:logback-app:run`. The decorated lo
 ### logback11
 
 Run the application with `./gradlew :examples:logback11-app:run`. The decorated log messages will be written to 
-`examples/logback11-app/logs/logback11-app.log`. See [logback11.xml](logback11-app/src/main/resources/logback11.xml) for the configuration.
+`examples/logback11-app/logs/logback11-app.log`. See [logback.xml](logback11-app/src/main/resources/logback.xml) for the configuration.
