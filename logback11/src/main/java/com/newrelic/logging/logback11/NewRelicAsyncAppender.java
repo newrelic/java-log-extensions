@@ -34,18 +34,20 @@ import java.util.function.Supplier;
  * @see <a href="https://logback.qos.ch/manual/appenders.html#AsyncAppender">Logback AsyncAppender</a>
  */
 public class NewRelicAsyncAppender extends AsyncAppender {
+    public static final String NEW_RELIC_PREFIX = "NewRelic:";
+
     @Override
     protected void preprocess(ILoggingEvent eventObject) {
         Map<String, String> linkingMetadata = agentSupplier.get().getLinkingMetadata();
         if (!isNoOpMDC) {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
-                MDC.put(entry.getKey(), entry.getValue());
+                MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
         }
         super.preprocess(eventObject);
         if (isNoOpMDC) {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
-                eventObject.getMDCPropertyMap().put(entry.getKey(), entry.getValue());
+                eventObject.getMDCPropertyMap().put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
         }
     }

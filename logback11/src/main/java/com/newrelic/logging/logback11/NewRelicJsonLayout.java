@@ -10,14 +10,18 @@ import ch.qos.logback.core.LayoutBase;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
+import com.newrelic.logging.core.LogExtensionConfig;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
+import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
+import static com.newrelic.logging.logback11.NewRelicAsyncAppender.NEW_RELIC_PREFIX;
+
 public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
 
-	@Override
+    @Override
     public String doLayout(ILoggingEvent event) {
         StringWriter sw = new StringWriter();
 
@@ -50,7 +54,12 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         Map<String, String> mdcPropertyMap = event.getMDCPropertyMap();
         for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
             if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                generator.writeStringField(entry.getKey(), entry.getValue());
+                if (entry.getKey().startsWith(NEW_RELIC_PREFIX)) {
+                    String key = entry.getKey().substring(NEW_RELIC_PREFIX.length());
+                    generator.writeStringField(key, entry.getValue());
+                } else if (LogExtensionConfig.shouldAddMDC()) {
+                    generator.writeStringField(CONTEXT_PREFIX + entry.getKey(), entry.getValue());
+                }
             }
         }
 

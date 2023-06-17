@@ -11,6 +11,8 @@
 There are some changes to your application to use the New Relic
 Logback Extension. All steps are required.
 
+**Optional**: [Configuration Options](..%2FREADME.md#configuration-options) for setting max stack size or collecting MDC.
+
 ### 1. Include the dependency in your project.
 
 Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:logback11) for the appropriate snippets.

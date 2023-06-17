@@ -37,13 +37,14 @@ public class LogAsserts {
     /**
      * Assert whether a specified field (aka attribute key) exists, or not, in the resulting log attributes that are recorded.
      *
-     * @param field String representing a field to check the existence of
-     * @param result String representing the actual results to assert against
+     * @param field       String representing a field to check the existence of
+     * @param result      String representing the actual results to assert against
      * @param shouldExist boolean true if field should exist in the result, else false
      * @throws IOException sometimes
      */
-    public static void assertFieldExistence(String field, String result, boolean shouldExist) throws IOException {
+    public static boolean assertFieldExistence(String field, String result, boolean shouldExist) throws IOException {
         assertEquals('\n', result.charAt(result.length() - 1));
+        boolean fieldExists = false;
 
         try (JsonParser parser = new JsonFactory().createParser(result)) {
             assertEquals(parser.nextToken(), JsonToken.START_OBJECT);
@@ -54,12 +55,14 @@ public class LogAsserts {
                     String elementName = parser.getValueAsString();
                     if (shouldExist && elementName.contains(field)) {
                         assertEquals(field, elementName);
+                        fieldExists = true;
                     } else {
                         assertNotEquals(field, elementName);
                     }
                 }
             }
         }
+        return fieldExists;
     }
 
     private static void assertValueIfPresent(String elementName, JsonParser parser, Map<String, Object> expectedValues) throws IOException {

@@ -39,10 +39,10 @@ _Optional_: Set `NEW_RELIC_LOG_EXTENSION_ADD_MDC=true` to include MDC data in th
 
 ### logback
 
-Run the application with `./gradlew :examples:logback:run`. The decorated log messages will be written to 
+Run the application with `./gradlew :examples:logback-app:run`. The decorated log messages will be written to 
 `examples/logback-app/logs/logback-app.log`. See [logback.xml](logback-app/src/main/resources/logback.xml) for the configuration.
 
 ### logback11
 
-Run the application with `./gradlew :examples:logback11:run`. The decorated log messages will be written to 
+Run the application with `./gradlew :examples:logback11-app:run`. The decorated log messages will be written to 
 `examples/logback11-app/logs/logback11-app.log`. See [logback11.xml](logback11-app/src/main/resources/logback11.xml) for the configuration.
