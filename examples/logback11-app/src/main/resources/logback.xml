@@ -4,6 +4,7 @@
 
     <appender name="LOG_FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/logback11-app.log</file>
+        <append>false</append>
         <encoder class="com.newrelic.logging.logback11.NewRelicEncoder"/>
     </appender>
 
