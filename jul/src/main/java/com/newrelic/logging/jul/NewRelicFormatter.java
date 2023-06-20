@@ -37,7 +37,7 @@ public class NewRelicFormatter extends Formatter {
             return e.toString();
         }
 
-        return sw.toString() + "\n";
+        return sw + "\n";
     }
 
     private void writeToGenerator(LogRecord record, JsonGenerator generator) throws IOException {

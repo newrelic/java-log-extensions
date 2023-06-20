@@ -19,7 +19,7 @@ We support:
 * [Dropwizard 1.3](dropwizard/README.md)
 
 ## Configuration Options
-The following config options apply to all supported logging frameworks.
+The following config options apply to all supported logging frameworks, with some noted exceptions.
 
 ### Mapped Diagnostic Context (MDC)
 Not all logging frameworks provide an MDC mechanism (e.g. JUL) but for those that do you can configure
