@@ -34,6 +34,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:3.4.4")
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation(project(":logback"))
+    testImplementation(project(":core-test"))
 }
 
 val jar by tasks.getting(Jar::class) {

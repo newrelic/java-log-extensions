@@ -10,6 +10,8 @@
 
 There are some changes to your application to use the New Relic Dropwizard Logging Extension. All steps are required.
 
+**Optional**: [Configuration Options](..%2FREADME.md#configuration-options) for setting max stack size or collecting MDC.
+
 ### 1. Include the dependency in your project.
 
 Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:dropwizard) for the appropriate snippets.
@@ -54,7 +56,9 @@ logging:
   appenders:
     - type: newrelic-file
       # This format will be ignored by the `newrelic-json` layout, but used by the `log-format` layout.
-      logFormat: "%date{ISO8601} %c %-5p: %m trace.id=%mdc{trace.id} span.id=%mdc{span.id}%n"
+      # The `replace` parameter in the PatternLayout retrieves all MDC values and strips off the
+      # `NewRelic:` prefix from all linking metadata keys.
+      logFormat: "%date{ISO8601} %c %-5p: %m %replace(%mdc{}){'NewRelic:', ''}%n"
       layout: 
 #        type: newrelic-json
         type: log-format

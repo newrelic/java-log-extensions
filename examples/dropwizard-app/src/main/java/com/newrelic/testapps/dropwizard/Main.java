@@ -10,6 +10,7 @@ import com.newrelic.api.agent.Trace;
 import com.newrelic.logging.dropwizard.access.LinkingMetadataAsRequestAttributesFilter;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
+import org.apache.log4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,17 @@ public class Main  extends Application<AppConfiguration> {
 
     @Override
     public void run(AppConfiguration configuration, Environment environment) {
+        // Enable MDC collection
+        // Alternatively, this could be set using the environment variable NEW_RELIC_LOG_EXTENSION_ADD_MDC
+        System.setProperty("newrelic.log_extension.add_mdc", "true");
+
+        logger.info("\uD83C\uDF89 Starting the program.");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
         // Set up our resource so Jersey can find it.
         environment.jersey().register(new Hello());
 
@@ -51,6 +63,9 @@ public class Main  extends Application<AppConfiguration> {
         });
 
         logger.info("Program complete.");
+
+        // Clear MDC data
+        MDC.clear();
     }
 
     @Trace(dispatcher = true)
