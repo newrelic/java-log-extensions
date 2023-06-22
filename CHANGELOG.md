@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.0.0
+* Exception Stack Trace Size - this has been changed from a default of `10` to `300`. This applies to all logging libraries supported by the `java-log-extension` project.
+    * This is configurable via:
+    * System property: `-Dnewrelic.log_extension.max_stack_size=integer`
+    * Environment Variable: `NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=integer`
+* Mapped Diagnostic Context (MDC) - decorating logs with MDC data is now generally supported but disabled by default. This applies to all logging libraries supported by the `java-log-extension` project, except for Java Util Logging (JUL) which does not provide an MDC mechanism. 
+  * This is configurable via:
+      * System property: `-Dnewrelic.log_extension.add_mdc=boolean`
+      * Environment Variable: `NEW_RELIC_LOG_EXTENSION_ADD_MDC=boolean`
+  * Note: This is considered a breaking change as previously some of the logging libraries automatically added MDC. If you upgrade to this version of the `java-log-extension` and wish to have MDC added to your logs then you will need to explicitly enable it. Currently, this will add all MDC as filtering out specific keys is not yet supported.
+
 ## 2.6.0
 * Removed the log forwarder. Please use the [New Relic Java Agent](https://github.com/newrelic/newrelic-java-agent) if you want log forwarding to be used.
 * Upgrade Gradle to version 7.5.1
