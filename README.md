@@ -38,7 +38,7 @@ You can configure the logging extension to control the max stack trace size for 
 
 Default max stack trace size is `300`. It is recommended that you do not exceed this value or data could be dropped or truncated as well as
 lead to higher log event ingest costs. Max stack trace size can be configured by environment variable (`NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=integer`)
-or system property (`-Dnewrelic.log_extension.max_stack_size=boolean`).
+or system property (`-Dnewrelic.log_extension.max_stack_size=integer`).
 
 ## Support
 
