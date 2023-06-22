@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 3.0.0
 * Exception Stack Trace Size - this has been changed from a default of `10` to `300`. This applies to all logging libraries supported by the `java-log-extension` project.
     * This is configurable via:
-    * System property: `-Dnewrelic.log_extension.max_stack_size=integer`
-    * Environment Variable: `NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=integer`
-* Mapped Diagnostic Context (MDC) - decorating logs with MDC data is now generally supported but disabled by default. This applies to all logging libraries supported by the `java-log-extension` project, except for Java Util Logging (JUL) which does not provide an MDC mechanism. 
+      * System property: `-Dnewrelic.log_extension.max_stack_size=integer`
+      * Environment Variable: `NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=integer`
+* Mapped Diagnostic Context (MDC) - decorating logs with MDC data is now generally supported but disabled by default. MDC keys will be prefixed by `context.` to prevent clashes with New Relic specific attributes. This applies to all logging libraries supported by the `java-log-extension` project, except for Java Util Logging (JUL) which does not provide an MDC mechanism. 
   * This is configurable via:
       * System property: `-Dnewrelic.log_extension.add_mdc=boolean`
       * Environment Variable: `NEW_RELIC_LOG_EXTENSION_ADD_MDC=boolean`
