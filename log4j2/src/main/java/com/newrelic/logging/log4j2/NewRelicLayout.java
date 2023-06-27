@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
 import com.newrelic.logging.core.ExceptionUtil;
+import com.newrelic.logging.core.LogExtensionConfig;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
@@ -19,11 +20,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
 
 /**
  * A {@link Layout} that writes the New Relic JSON format.
- *
+ * <p>
  * This layout must be added to an {@link AbstractAppender} via {@link AbstractAppender.Builder#withLayout(Layout)} or XML.
  * The New Relic layout has specific fields and field names and has no customizable elements. To configure,
  * update your logging config xml like this:
@@ -59,7 +65,7 @@ public class NewRelicLayout extends AbstractStringLayout {
             return e.toString();
         }
 
-        return sw.toString() + "\n";
+        return sw + "\n";
     }
 
     private void writeToGenerator(LogEvent event, JsonGenerator generator) throws IOException {
@@ -78,21 +84,47 @@ public class NewRelicLayout extends AbstractStringLayout {
 
         Map<String, String> map = event.getContextData().toMap();
         if (map != null) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                if (entry.getKey().startsWith(NewRelicContextDataProvider.NEW_RELIC_PREFIX)) {
-                    String key = entry.getKey().substring(NewRelicContextDataProvider.NEW_RELIC_PREFIX.length());
-                    generator.writeStringField(key , entry.getValue());
+            Map<String, Set<String>> multiValueMap = createMultiValueMapOfContextData(map);
+
+            for (Map.Entry<String, Set<String>> entry : multiValueMap.entrySet()) {
+                String[] values = entry.getValue().toArray(new String[0]);
+                // Handle case where a key could map to multiple values
+                if (values.length > 1) {
+                    generator.writeArrayFieldStart(entry.getKey());
+                    generator.writeArray(values, 0, values.length);
+                    generator.writeEndArray();
+                } else {
+                    generator.writeStringField(entry.getKey(), values[0]);
                 }
             }
-        }
 
-        Throwable throwable = event.getThrown();
-        if (throwable != null) {
-            generator.writeObjectField(ElementName.ERROR_CLASS, throwable.getClass().getName());
-            generator.writeObjectField(ElementName.ERROR_MESSAGE, throwable.getMessage());
-            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(throwable));
+            Throwable throwable = event.getThrown();
+            if (throwable != null) {
+                generator.writeObjectField(ElementName.ERROR_CLASS, throwable.getClass().getName());
+                generator.writeObjectField(ElementName.ERROR_MESSAGE, throwable.getMessage());
+                generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(throwable));
+            }
+            generator.writeEndObject();
         }
+    }
 
-        generator.writeEndObject();
+    /**
+     * Create a multi value map of context data that strips the NEW_RELIC_PREFIX from keys and adds
+     * MDC context data if configured to do so.
+     *
+     * @param map of context data from log event
+     * @return multi value map of context data
+     */
+    private Map<String, Set<String>> createMultiValueMapOfContextData(Map<String, String> map) {
+        Map<String, Set<String>> multiValueMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getKey().startsWith(NewRelicContextDataProvider.NEW_RELIC_PREFIX)) {
+                String key = entry.getKey().substring(NewRelicContextDataProvider.NEW_RELIC_PREFIX.length());
+                multiValueMap.computeIfAbsent(key, k -> new HashSet<>()).add(entry.getValue());
+            } else if (LogExtensionConfig.shouldAddMDC()) {
+                multiValueMap.computeIfAbsent(CONTEXT_PREFIX + entry.getKey(), k -> new HashSet<>()).add(entry.getValue());
+            }
+        }
+        return multiValueMap;
     }
 }

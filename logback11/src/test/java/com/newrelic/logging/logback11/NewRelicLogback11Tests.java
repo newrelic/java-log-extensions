@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.Mockito;
+import org.slf4j.MDC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -74,6 +76,28 @@ class NewRelicLogback11Tests {
         thenTheCallerDataIsInTheMessage();
     }
 
+    @Test
+    @Timeout(3)
+    void shouldAppendMDCArgsToJsonWhenEnabled() throws Throwable {
+        givenMockAgentData();
+        givenARedirectedAppender();
+        givenALoggingEventWithMDCEnabled();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheMDCFieldsAreInTheMessage(true);
+    }
+
+    @Test
+    @Timeout(3)
+    void shouldNotAppendMDCArgsToJsonWhenDisabled() throws Throwable {
+        givenMockAgentData();
+        givenARedirectedAppender();
+        givenALoggingEventWithMDCDisabled();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheMDCFieldsAreInTheMessage(false);
+    }
+
     private void givenMockAgentData() {
         Agent mockAgent = Mockito.mock(Agent.class);
         Mockito.when(mockAgent.getLinkingMetadata()).thenReturn(ImmutableMap.of("some.key", "some.value"));
@@ -93,6 +117,30 @@ class NewRelicLogback11Tests {
     private void givenALoggingEventWithCallerData() {
         givenALoggingEvent();
         event.setCallerData(new StackTraceElement[] { new Exception().getStackTrace()[0] });
+    }
+
+    private void givenALoggingEventWithMDCEnabled() {
+        // Enable MDC collection
+        System.setProperty("newrelic.log_extension.add_mdc", "true");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
+        givenALoggingEvent();
+    }
+
+    private void givenALoggingEventWithMDCDisabled() {
+        // Disable MDC collection
+        System.setProperty("newrelic.log_extension.add_mdc", "false");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
+        givenALoggingEvent();
     }
 
     private void givenARedirectedAppender() {
@@ -143,6 +191,30 @@ class NewRelicLogback11Tests {
         );
     }
 
+    private void thenTheMDCFieldsAreInTheMessage(boolean shouldExist) throws Throwable {
+        String result = getOutput();
+        boolean contextKey1Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey1",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey1Exists, "MDC context.contextKey1 should exist: " + shouldExist);
+
+        boolean contextKey2Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey2",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey2Exists, "MDC context.contextKey2 should exist: " + shouldExist);
+
+        boolean contextKey3Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey3",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey3Exists, "MDC context.contextKey3 should exist: " + shouldExist);
+    }
+
     private String getOutput() throws IOException {
         if (output == null) {
             output = bufferedReader.readLine() + "\n";
@@ -170,11 +242,15 @@ class NewRelicLogback11Tests {
 
     @BeforeAll
     static void setUpClass() {
+        // Clear MDC data before each test
+        MDC.clear();
         savedSupplier = NewRelicAsyncAppender.agentSupplier;
     }
 
     @AfterAll
     static void tearDownClass() {
+        // Clear MDC data before each test
+        MDC.clear();
         NewRelicAsyncAppender.agentSupplier = savedSupplier;
     }
 

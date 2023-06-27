@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.Mockito;
+import org.slf4j.MDC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -59,7 +61,7 @@ class NewRelicLogbackTests {
         givenMockAgentData();
         givenARedirectedAppender();
         givenMDCIsANoOp();
-        givenALoggingEvent();
+        givenALoggingEventWithMDCDisabled();
         whenTheEventIsAppended();
         thenMockAgentDataIsInTheMessage();
         thenJsonLayoutWasUsed();
@@ -98,6 +100,28 @@ class NewRelicLogbackTests {
         thenTheCustomArgsAreInTheMessage();
     }
 
+    @Test
+    @Timeout(3)
+    void shouldAppendMDCArgsToJsonWhenEnabled() throws Throwable {
+        givenMockAgentData();
+        givenARedirectedAppender();
+        givenALoggingEventWithMDCEnabled();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheMDCFieldsAreInTheMessage(true);
+    }
+
+    @Test
+    @Timeout(3)
+    void shouldNotAppendMDCArgsToJsonWhenDisabled() throws Throwable {
+        givenMockAgentData();
+        givenARedirectedAppender();
+        givenALoggingEventWithMDCDisabled();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheMDCFieldsAreInTheMessage(false);
+    }
+
     private void givenMockAgentData() {
         Agent mockAgent = Mockito.mock(Agent.class);
         Mockito.when(mockAgent.getLinkingMetadata()).thenReturn(ImmutableMap.of("some.key", "some.value"));
@@ -132,6 +156,30 @@ class NewRelicLogbackTests {
         customArgs[0] = customArgument1;
         customArgs[1] = customArgument2;
         event.setArgumentArray(customArgs);
+    }
+
+    private void givenALoggingEventWithMDCEnabled() {
+        // Enable MDC collection
+        System.setProperty("newrelic.log_extension.add_mdc", "true");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
+        givenALoggingEvent();
+    }
+
+    private void givenALoggingEventWithMDCDisabled() {
+        // Disable MDC collection
+        System.setProperty("newrelic.log_extension.add_mdc", "false");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
+        givenALoggingEvent();
     }
 
     private void givenARedirectedAppender() {
@@ -199,6 +247,30 @@ class NewRelicLogbackTests {
         );
     }
 
+    private void thenTheMDCFieldsAreInTheMessage(boolean shouldExist) throws Throwable {
+        String result = getOutput();
+        boolean contextKey1Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey1",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey1Exists, "MDC context.contextKey1 should exist: " + shouldExist);
+
+        boolean contextKey2Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey2",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey2Exists, "MDC context.contextKey2 should exist: " + shouldExist);
+
+        boolean contextKey3Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey3",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey3Exists, "MDC context.contextKey3 should exist: " + shouldExist);
+    }
+
     private String getOutput() throws IOException {
         if (output == null) {
             output = bufferedReader.readLine() + "\n";
@@ -209,6 +281,8 @@ class NewRelicLogbackTests {
 
     @BeforeEach
     void setUp() throws Exception {
+        // Clear MDC data before each test
+        MDC.clear();
         isNoOpMDC = NewRelicAsyncAppender.isNoOpMDC;
         outputStream = new PipedOutputStream();
         PipedInputStream inputStream = new PipedInputStream(outputStream);
@@ -217,6 +291,8 @@ class NewRelicLogbackTests {
 
     @AfterEach
     void tearDown() throws Exception {
+        // Clear MDC data before each test
+        MDC.clear();
         NewRelicAsyncAppender.isNoOpMDC = isNoOpMDC;
         appender.stop();
         appender.detachAndStopAllAppenders();

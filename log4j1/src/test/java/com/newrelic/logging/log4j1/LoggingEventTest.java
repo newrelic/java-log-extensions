@@ -10,18 +10,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
 
 import static com.newrelic.logging.core.ElementName.CLASS_NAME;
@@ -34,6 +30,8 @@ import static com.newrelic.logging.core.ElementName.MESSAGE;
 import static com.newrelic.logging.core.ElementName.METHOD_NAME;
 import static com.newrelic.logging.core.ElementName.THREAD_NAME;
 import static com.newrelic.logging.core.ElementName.TIMESTAMP;
+import static com.newrelic.logging.core.LogExtensionConfig.ADD_MDC_SYS_PROP;
+import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -79,7 +77,6 @@ class LoggingEventTest {
         LoggingEvent evt = new LoggingEvent("abc", Logger.getLogger("foo"), 123123123123L, Level.INFO,
                 "whoopsie", new Exception("~~ oops ~~"));
 
-
         targetAppender.append(evt);
 
         whenOneMessageIsConfirmedLogged();
@@ -92,17 +89,57 @@ class LoggingEventTest {
     }
 
     @Test
-    void shouldIncludeMDCProperties() throws Exception {
+    void shouldNotIncludeMDCProperties() throws Exception {
         givenMockReturnsAnOpaqueValue();
         givenAppenderChainIsConfiguredForOneMessage();
 
-        MDC.put("an.mdc.key", "an.mdc.value");
+        String mdcKey = "an.mdc.key";
+        String prefixedMdcKey = CONTEXT_PREFIX + mdcKey;
+
+        MDC.put(mdcKey, "an.mdc.value");
         Logger.getLogger("foo").log(Level.WARN, "hello, i'm another message");
-        MDC.put("an.mdc.key", "some wacky value that changed _after_ we logged!");
+        MDC.put(mdcKey, "some wacky value that changed _after_ we logged!");
 
         whenOneMessageIsConfirmedLogged();
 
-        LogAsserts.assertFieldValues(innerAppender.appendedStrings.get(0), ImmutableMap.<String, Object>builder()
+        String result = innerAppender.appendedStrings.get(0);
+
+        LogAsserts.assertFieldValues(result, ImmutableMap.<String, Object>builder()
+                .put(MESSAGE, "hello, i'm another message")
+                .put(LOGGER_NAME, "foo")
+                .put(LOG_LEVEL, "WARN")
+                .put(THREAD_NAME, Thread.currentThread().getName())
+                .put(CLASS_NAME, getClass().getName())
+                .put(METHOD_NAME, "shouldNotIncludeMDCProperties")
+                .put("an.opaque", "value")
+                .put(mdcKey, "an.mdc.value")
+                .build()
+        );
+
+        // MDC collection is disabled by default, key should not exist
+        LogAsserts.assertFieldExistence(prefixedMdcKey, result, false);
+    }
+
+    @Test
+    void shouldIncludeMDCProperties() throws Exception {
+        // Explicitly enable MDC collection
+        System.setProperty(ADD_MDC_SYS_PROP, "true");
+
+        givenMockReturnsAnOpaqueValue();
+        givenAppenderChainIsConfiguredForOneMessage();
+
+        String mdcKey = "an.mdc.key";
+        String prefixedMdcKey = CONTEXT_PREFIX + mdcKey;
+
+        MDC.put(mdcKey, "an.mdc.value");
+        Logger.getLogger("foo").log(Level.WARN, "hello, i'm another message");
+        MDC.put(mdcKey, "some wacky value that changed _after_ we logged!");
+
+        whenOneMessageIsConfirmedLogged();
+
+        String result = innerAppender.appendedStrings.get(0);
+
+        LogAsserts.assertFieldValues(result, ImmutableMap.<String, Object>builder()
                 .put(MESSAGE, "hello, i'm another message")
                 .put(LOGGER_NAME, "foo")
                 .put(LOG_LEVEL, "WARN")
@@ -110,9 +147,12 @@ class LoggingEventTest {
                 .put(CLASS_NAME, getClass().getName())
                 .put(METHOD_NAME, "shouldIncludeMDCProperties")
                 .put("an.opaque", "value")
-                .put("an.mdc.key", "an.mdc.value")
+                .put(mdcKey, "an.mdc.value")
                 .build()
         );
+
+        // MDC collection is explicitly enabled, key should exist
+        LogAsserts.assertFieldExistence(prefixedMdcKey, result, true);
     }
 
     private void givenAppenderChainIsConfiguredForOneMessage() {

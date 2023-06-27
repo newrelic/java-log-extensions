@@ -11,6 +11,9 @@
 There are some changes to your application to use the New Relic
 `java.util.logging` Extension. All steps are required.
 
+**Optional**: [Configuration Options](..%2FREADME.md#configuration-options) for setting max stack size.
+Note that JUL does not support collecting MDC and thus the optional MDC config options will have no effect.
+
 ### 1. Include the extension in your project.
 
 Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:jul) for the appropriate snippets.

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2019. New Relic Corporation. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package com.newrelic.logging.dropwizard.access;
 
 import ch.qos.logback.access.spi.IAccessEvent;

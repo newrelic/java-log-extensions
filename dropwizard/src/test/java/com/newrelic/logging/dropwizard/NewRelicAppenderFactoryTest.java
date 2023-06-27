@@ -1,7 +1,9 @@
-package com.newrelic.logging.dropwizard;/*
+/*
  * Copyright 2019. New Relic Corporation. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
+
+package com.newrelic.logging.dropwizard;
 
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.Level;
@@ -16,10 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import com.newrelic.api.agent.Agent;
-import com.newrelic.logging.dropwizard.LogFormatLayoutFactory;
-import com.newrelic.logging.dropwizard.NewRelicConsoleAppenderFactory;
-import com.newrelic.logging.dropwizard.NewRelicFileAppenderFactory;
-import com.newrelic.logging.dropwizard.NewRelicJsonLayoutFactory;
+import com.newrelic.logging.core.LogAsserts;
 import com.newrelic.logging.logback.NewRelicAsyncAppender;
 import io.dropwizard.logging.AbstractOutputStreamAppenderFactory;
 import io.dropwizard.logging.async.AsyncLoggingEventAppenderFactory;
@@ -33,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
+import org.slf4j.MDC;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -111,7 +111,6 @@ class NewRelicAppenderFactoryTest {
         thenJsonLayoutWasUsed();
     }
 
-
     @Test
     @Timeout(3)
     void shouldAppendCallerDataToJsonCorrectly() throws Throwable {
@@ -123,6 +122,56 @@ class NewRelicAppenderFactoryTest {
         whenTheEventIsAppended();
         thenJsonLayoutWasUsed();
         thenTheCallerDataIsInTheMessage();
+    }
+
+    @Test
+    @Timeout(3)
+    void shouldAppendMDCArgsToJsonWhenEnabled() throws Throwable {
+        givenMockAgentData();
+        givenOurFileAppenderFactory();
+        givenOurAppenderFactoryHasJsonLayoutType();
+        givenARedirectedAppender();
+        givenALoggingEventWithMDCEnabled();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheMDCFieldsAreInTheMessage(true);
+    }
+
+    @Test
+    @Timeout(3)
+    void shouldNotAppendMDCArgsToJsonWhenDisabled() throws Throwable {
+        givenMockAgentData();
+        givenOurFileAppenderFactory();
+        givenOurAppenderFactoryHasJsonLayoutType();
+        givenARedirectedAppender();
+        givenALoggingEventWithMDCDisabled();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheMDCFieldsAreInTheMessage(false);
+    }
+
+    private void thenTheMDCFieldsAreInTheMessage(boolean shouldExist) throws Throwable {
+        String result = getOutput();
+        boolean contextKey1Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey1",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey1Exists, "MDC context.contextKey1 should exist: " + shouldExist);
+
+        boolean contextKey2Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey2",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey2Exists, "MDC context.contextKey2 should exist: " + shouldExist);
+
+        boolean contextKey3Exists = LogAsserts.assertFieldExistence(
+                "context.contextKey3",
+                result,
+                shouldExist
+        );
+        assertEquals(shouldExist, contextKey3Exists, "MDC context.contextKey3 should exist: " + shouldExist);
     }
 
     private void givenMockAgentData() {
@@ -146,7 +195,7 @@ class NewRelicAppenderFactoryTest {
 
     private void givenOurAppenderFactoryHasLogFormatLayout() {
         appenderFactory.setLayout(new LogFormatLayoutFactory());
-        appenderFactory.setLogFormat("%-5p : %m : %X%n");
+        appenderFactory.setLogFormat("%-5p : %m : %replace(%mdc{}){'NewRelic:', ''}%n");
     }
 
     private void givenOurAppenderFactoryHasJsonLayoutType() {
@@ -157,6 +206,30 @@ class NewRelicAppenderFactoryTest {
         event = new LoggingEvent();
         event.setMessage("test_error_message");
         event.setLevel(Level.ERROR);
+    }
+
+    private void givenALoggingEventWithMDCEnabled() {
+        // Enable MDC collection
+        System.setProperty("newrelic.log_extension.add_mdc", "true");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
+        givenALoggingEvent();
+    }
+
+    private void givenALoggingEventWithMDCDisabled() {
+        // Enable MDC collection
+        System.setProperty("newrelic.log_extension.add_mdc", "false");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
+        givenALoggingEvent();
     }
 
     private void givenALoggingEventWithCallerData() {
@@ -194,7 +267,7 @@ class NewRelicAppenderFactoryTest {
     }
 
     private void thenLogFormatLayoutWasUsed() throws IOException {
-        assertEquals("ERROR : test_error_message : some.key=some.value", getOutput());
+        assertEquals("ERROR : test_error_message : some.key=some.value\n", getOutput());
     }
 
     private void thenJsonLayoutWasUsed() throws IOException {
@@ -210,7 +283,7 @@ class NewRelicAppenderFactoryTest {
     private void thenMockAgentDataIsInTheMessage() throws Throwable {
         assertTrue(
                 getOutput().contains("some.key=some.value")
-                || getOutput().contains("\"some.key\":\"some.value\""),
+                        || getOutput().contains("\"some.key\":\"some.value\""),
                 "Expected >>" + getOutput() + "<< to contain some.key to some.value"
         );
     }
@@ -226,13 +299,15 @@ class NewRelicAppenderFactoryTest {
 
     private String getOutput() throws IOException {
         if (output == null) {
-            output = bufferedReader.readLine();
+            output = bufferedReader.readLine() + "\n";
         }
         return output;
     }
 
     @BeforeEach
     void setUp() throws Exception {
+        // Clear MDC data before each test
+        MDC.clear();
         outputStream = new PipedOutputStream();
         PipedInputStream inputStream = new PipedInputStream(outputStream);
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -240,6 +315,8 @@ class NewRelicAppenderFactoryTest {
 
     @AfterEach
     void tearDown() throws Exception {
+        // Clear MDC data after each test
+        MDC.clear();
         outputStream.close();
         bufferedReader.close();
     }

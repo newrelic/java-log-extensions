@@ -10,6 +10,7 @@ import com.newrelic.api.agent.Token;
 import com.newrelic.api.agent.Trace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,15 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
+        // Enable MDC collection
+        // Alternatively, this could be set using the environment variable NEW_RELIC_LOG_EXTENSION_ADD_MDC
+        System.setProperty("newrelic.log_extension.add_mdc", "true");
+
+        // Add MDC data
+        MDC.put("contextKey1", "contextData1");
+        MDC.put("contextKey2", "contextData2");
+        MDC.put("contextKey3", "contextData3");
+
         logger.info("Starting the program.");
         List<Thread> threads = Arrays.asList(
                 new Thread(() -> transactionWithError("Here is an error")),
@@ -40,6 +50,8 @@ public class Main {
         // assume SLF4J is bound to logback-classic in the current environment
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         loggerContext.stop();
+
+        MDC.clear();
     }
 
     @Trace(dispatcher = true)

@@ -19,8 +19,10 @@ logging:
       archive: false
       currentLogFilename: ./logs/my-app.log
     # This stanza uses the newrelic-console appender with a standard format. Because
-    # linking metadata is included in the MDC, the attributes can be extracted in most any layout.
+    # linking metadata is included in the MDC, the attributes can be extracted in almost any layout.
+    # The `replace` parameter in the PatternLayout retrieves all MDC values and strips off the
+    # `NewRelic:` prefix from all linking metadata keys.
     - type: newrelic-console
-      logFormat: "%date{ISO8601} %c %-5p: %m trace.id=%mdc{trace.id} span.id=%mdc{span.id}%n"
+      logFormat: "%date{ISO8601} %c %-5p: %m %replace(%mdc{}){'NewRelic:', ''}%n"
       layout:
         type: log-format

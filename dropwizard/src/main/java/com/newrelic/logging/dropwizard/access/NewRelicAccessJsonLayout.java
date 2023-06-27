@@ -48,8 +48,9 @@ public class NewRelicAccessJsonLayout extends LayoutBase<IAccessEvent> {
         generator.writeStringField("net.peer.ip", event.getRemoteAddr());
         generator.writeStringField("net.peer.host", event.getRemoteHost());
 
+        // Dropwizard logging (via underlying logback-access library) doesn't
+        // support MDC on access request logs thus we only add NR linking metadata
         writeLinkingMetadata(event, generator);
-
         generator.writeEndObject();
     }
 

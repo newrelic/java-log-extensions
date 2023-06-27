@@ -12,6 +12,7 @@ import ch.qos.logback.core.LayoutBase;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
 import com.newrelic.logging.core.ExceptionUtil;
+import com.newrelic.logging.core.LogExtensionConfig;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -19,13 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.newrelic.logging.core.ExceptionUtil.MAX_STACK_SIZE;
+import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
+import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
+import static com.newrelic.logging.logback.NewRelicAsyncAppender.NEW_RELIC_PREFIX;
 
 public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     private final Integer maxStackSize;
 
     public NewRelicJsonLayout() {
-        this(MAX_STACK_SIZE);
+        this(getMaxStackSize());
     }
 
     public NewRelicJsonLayout(Integer maxStackSize) {
@@ -48,7 +51,7 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
 
     private void writeToGenerator(ILoggingEvent event, JsonGenerator generator) throws IOException {
         generator.writeStartObject();
-        
+
         generator.writeStringField(ElementName.MESSAGE, event.getFormattedMessage());
         generator.writeNumberField(ElementName.TIMESTAMP, event.getTimeStamp());
         generator.writeStringField(ElementName.LOG_LEVEL, event.getLevel().toString());
@@ -65,7 +68,12 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         Map<String, String> mdcPropertyMap = event.getMDCPropertyMap();
         for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
             if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                generator.writeStringField(entry.getKey(), entry.getValue());
+                if (entry.getKey().startsWith(NEW_RELIC_PREFIX)) {
+                    String key = entry.getKey().substring(NEW_RELIC_PREFIX.length());
+                    generator.writeStringField(key, entry.getValue());
+                } else if (LogExtensionConfig.shouldAddMDC()) {
+                    generator.writeStringField(CONTEXT_PREFIX + entry.getKey(), entry.getValue());
+                }
             }
         }
 

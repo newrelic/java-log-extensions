@@ -18,7 +18,7 @@ import java.util.TimeZone;
  * The purpose of this layout factory is to provide a fallback so that
  * users only need to change the layout `type` element (between {@literal newrelic-json} and
  * {@literal log-format}) to switch between json and formatted output.
- *
+ * <p>
  * The other option is to fully remove {@literal layout} from the YAML.
  */
 @JsonTypeName("log-format")
@@ -32,7 +32,7 @@ public class LogFormatLayoutFactory implements DiscoverableLayoutFactory<ILoggin
     @Override
     public LayoutBase<ILoggingEvent> build(LoggerContext context, TimeZone timeZone) {
         DropwizardLayout layout = new DropwizardLayout(context, timeZone);
-        if(logFormat != null && !logFormat.isEmpty()) {
+        if (logFormat != null && !logFormat.isEmpty()) {
             layout.setPattern(logFormat);
         }
         return layout;

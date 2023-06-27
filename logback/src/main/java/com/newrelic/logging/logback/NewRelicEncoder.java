@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static com.newrelic.logging.core.ExceptionUtil.MAX_STACK_SIZE;
+import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
 
 /**
  * An {@link ch.qos.logback.core.encoder.Encoder} that will write New Relic's JSON format.
@@ -32,7 +32,7 @@ import static com.newrelic.logging.core.ExceptionUtil.MAX_STACK_SIZE;
 public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     private NewRelicJsonLayout layout;
 
-    private Integer maxStackSize = MAX_STACK_SIZE;
+    private Integer maxStackSize = getMaxStackSize();
 
     @Override
     public byte[] encode(ILoggingEvent event) {
