@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import static com.newrelic.logging.core.LogExtensionConfig.getIncludeFullErrorStacktrace;
 import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
 
 /**
@@ -49,7 +50,7 @@ public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     @Override
     public void start() {
         super.start();
-        layout = new NewRelicJsonLayout(maxStackSize);
+        layout = new NewRelicJsonLayout(maxStackSize, getIncludeFullErrorStacktrace());
         layout.start();
     }
 

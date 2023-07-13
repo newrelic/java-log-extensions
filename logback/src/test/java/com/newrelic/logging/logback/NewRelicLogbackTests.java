@@ -91,6 +91,17 @@ class NewRelicLogbackTests {
 
     @Test
     @Timeout(3)
+    void shouldAppendFullErrorDataCorrectly() throws Throwable {
+        givenMockAgentData();
+        givenARedirectedAppender();
+        givenALoggingEventWithExceptionDataIncludingCausedBy();
+        whenTheEventIsAppended();
+        thenJsonLayoutWasUsed();
+        thenTheExceptionCausedByDataIsInTheMessage();
+    }
+
+    @Test
+    @Timeout(3)
     void shouldAppendCustomArgsToJsonCorrectly() throws Throwable {
         givenMockAgentData();
         givenARedirectedAppender();
@@ -141,6 +152,12 @@ class NewRelicLogbackTests {
     private void givenALoggingEventWithExceptionData() {
         givenALoggingEvent();
         event.setThrowableProxy(new ThrowableProxy(new Exception("~~ oops ~~")));
+    }
+
+    private void givenALoggingEventWithExceptionDataIncludingCausedBy() {
+        System.setProperty("newrelic.log_extension.include_full_error_stack", "true");
+        givenALoggingEvent();
+        event.setThrowableProxy(new ThrowableProxy(new Exception("~~ oops ~~", new Exception("~~ oops inner 1 ~~", new Exception("~~ oops inner 2 ~~")))));
     }
 
     private void givenALoggingEventWithCallerData() {
@@ -238,6 +255,16 @@ class NewRelicLogbackTests {
                         "error.stack", Pattern.compile(".*NewRelicLogbackTests\\.shouldAppendErrorDataCorrectly.*", Pattern.DOTALL),
                         "error.message", "~~ oops ~~")
         );
+    }
+
+    private void thenTheExceptionCausedByDataIsInTheMessage() throws Throwable {
+        LogAsserts.assertFieldValues(
+                getOutput(),
+                ImmutableMap.of(
+                        "error.stack.causedby", Pattern.compile(".*Caused By.*", Pattern.DOTALL),
+                        "error.stack.inner1", Pattern.compile(".*oops inner 1.*", Pattern.DOTALL),
+                        "error.stack.inner2", Pattern.compile(".*oops inner 2.*", Pattern.DOTALL)
+        ));
     }
 
     private void thenTheCustomArgsAreInTheMessage() throws Throwable {

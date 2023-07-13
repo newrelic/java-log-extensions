@@ -40,6 +40,36 @@ Default max stack trace size is `300`. It is recommended that you do not exceed 
 lead to higher log event ingest costs. Max stack trace size can be configured by environment variable (`NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=integer`)
 or system property (`-Dnewrelic.log_extension.max_stack_size=integer`).
 
+### Include full exception stack trace
+<b>Only supported on logback</b>
+
+You can configure the logging extension to include in `error.stack` the full stack trace just like the downstream library does.
+This includes the caused by chain.
+
+As an example, this snippet:
+```
+Exception inner2 = new IllegalAccessException("test caused by 2");
+Exception inner1 = new RuntimeException("test caused by 1", inner2);
+LOGGER.error("failed for test!", new RuntimeException("test exception", inner1));
+```
+Will set the `error.stack` as
+```
+java.lang.RuntimeException: test exception
+    at (regular stacktrace)
+    at ...
+Caused by: java.lang.RuntimeException: test caused by 1
+	... 49 common frames omitted
+Caused by: java.lang.IllegalAccessException: test caused by 2
+	... 49 common frames omitted
+```
+
+Default is `false` for retro-compatibility.
+
+This setting can be enabled via environment variable (`NEW_RELIC_LOG_EXTENSION_INCLUDE_FULL_ERROR_STACK=true`) or system variable (`-Dnewrelic.log_extension.include_full_error_stack=true`).
+
+Be aware that enabling this setting will use the downstream library's stacktrace generation, not taking in  consideration 
+the value of [Exception Stack Trace Size](#exception-stack-trace-size).
+
 ## Support
 
 Should you need assistance with New Relic products, you are in good hands with several diagnostic tools and support channels.

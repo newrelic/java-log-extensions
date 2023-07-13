@@ -8,6 +8,7 @@ package com.newrelic.logging.logback;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.classic.spi.ThrowableProxyUtil;
 import ch.qos.logback.core.LayoutBase;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
@@ -21,18 +22,21 @@ import java.util.List;
 import java.util.Map;
 
 import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
+import static com.newrelic.logging.core.LogExtensionConfig.getIncludeFullErrorStacktrace;
 import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
 import static com.newrelic.logging.logback.NewRelicAsyncAppender.NEW_RELIC_PREFIX;
 
 public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     private final Integer maxStackSize;
+    private final boolean includeFullErrorStacktrace;
 
     public NewRelicJsonLayout() {
-        this(getMaxStackSize());
+        this(getMaxStackSize(), getIncludeFullErrorStacktrace());
     }
 
-    public NewRelicJsonLayout(Integer maxStackSize) {
+    public NewRelicJsonLayout(Integer maxStackSize, boolean includeFullErrorStacktrace) {
         this.maxStackSize = maxStackSize;
+        this.includeFullErrorStacktrace = includeFullErrorStacktrace;
     }
 
     @Override
@@ -96,14 +100,18 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             generator.writeObjectField(ElementName.ERROR_CLASS, proxy.getClassName());
             generator.writeObjectField(ElementName.ERROR_MESSAGE, proxy.getMessage());
 
-            StackTraceElementProxy[] stackProxy = proxy.getStackTraceElementProxyArray();
-            if (stackProxy != null && stackProxy.length > 0) {
-                List<StackTraceElement> elements = new ArrayList<>(maxStackSize);
-                for (int i = 0; i < maxStackSize && i < stackProxy.length; i++) {
-                    elements.add(stackProxy[i].getStackTraceElement());
-                }
+            if (includeFullErrorStacktrace){
+                generator.writeObjectField(ElementName.ERROR_STACK, ThrowableProxyUtil.asString(proxy));
+            } else {
+                StackTraceElementProxy[] stackProxy = proxy.getStackTraceElementProxyArray();
+                if (stackProxy != null && stackProxy.length > 0) {
+                    List<StackTraceElement> elements = new ArrayList<>(maxStackSize);
+                    for (int i = 0; i < maxStackSize && i < stackProxy.length; i++) {
+                        elements.add(stackProxy[i].getStackTraceElement());
+                    }
 
-                generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(elements.toArray(new StackTraceElement[0]), maxStackSize));
+                    generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(elements.toArray(new StackTraceElement[0]), maxStackSize));
+                }
             }
         }
 

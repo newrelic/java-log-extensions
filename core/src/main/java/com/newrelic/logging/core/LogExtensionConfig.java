@@ -13,6 +13,9 @@ public class LogExtensionConfig {
     public static final String MAX_STACK_SIZE_SYS_PROP = CONFIG_PREFIX_SYS_PROP + "max_stack_size";
     public static final String ADD_MDC_ENV_VAR = CONFIG_PREFIX_ENV_VAR + "ADD_MDC";
     public static final String ADD_MDC_SYS_PROP = CONFIG_PREFIX_SYS_PROP + "add_mdc";
+
+    public static final String INCLUDE_FULL_ERROR_STACK_ENV = CONFIG_PREFIX_ENV_VAR + "INCLUDE_FULL_ERROR_STACK";
+    public static final String INCLUDE_FULL_ERROR_SYS_PROP = CONFIG_PREFIX_SYS_PROP + "include_full_error_stack";
     public static final boolean ADD_MDC_DEFAULT = false;
 
     /**
@@ -32,6 +35,24 @@ public class LogExtensionConfig {
             return Integer.parseInt(sysProp);
         } else {
             return ExceptionUtil.MAX_STACK_SIZE_DEFAULT;
+        }
+    }
+
+    /**
+     * Get a boolean representing if error stack should include the full stacktrace, including the "caused by" chain
+     * <p/>Default, for retro-compatibility, is {@code false}.
+     * @return boolean representing include full error stack configuration
+     */
+    public static boolean getIncludeFullErrorStacktrace(){
+        String envVar = System.getenv(INCLUDE_FULL_ERROR_STACK_ENV);
+        String sysProp = System.getProperty(INCLUDE_FULL_ERROR_SYS_PROP);
+
+        if (envVar != null){
+            return Boolean.parseBoolean(envVar);
+        } else if (sysProp != null) {
+            return Boolean.parseBoolean(sysProp);
+        } else {
+            return false;
         }
     }
 
