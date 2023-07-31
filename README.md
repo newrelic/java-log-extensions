@@ -49,7 +49,7 @@ If the issue has been confirmed as a bug or is a Feature request, please file a 
 **Support Channels**
 
 * [New Relic Documentation](https://docs.newrelic.com/docs/logs/enable-log-management-new-relic/logs-context-java/configure-logs-context-java): Comprehensive guidance for using our platform
-* [New Relic Community](https://discuss.newrelic.com/tags/logs): The best place to engage in troubleshooting questions
+* [New Relic Community](https://forum.newrelic.com/s/?c__tags=%5B%7B%22id%22%3A%22a9P8W0000004KTNUA2%22%2C%22isCustomImage%22%3Afalse%2C%22sObjectType%22%3A%22Tag__c%22%2C%22subtitle%22%3A%22%22%2C%22title%22%3A%22logs-in-context%22%2C%22titleFormatted%22%3A%22%3Cstrong%3Elogs%3C%2Fstrong%3E-in-context%22%2C%22subtitleFormatted%22%3A%22%22%2C%22icon%22%3A%22standard%3Adefault%22%7D%5D): The best place to engage in troubleshooting questions
 * [New Relic University](https://learn.newrelic.com/): A range of online training for New Relic users of every level
 * [New Relic Technical Support](https://support.newrelic.com/) 24/7/365 ticketed support. Read more about our [Technical Support Offerings](https://docs.newrelic.com/docs/licenses/license-information/general-usage-licenses/support-plan). 
 
