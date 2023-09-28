@@ -64,7 +64,6 @@ public class NewRelicFormatter extends Formatter {
         if (record.getThrown() != null) {
             generator.writeObjectField(ElementName.ERROR_CLASS, record.getThrown().getClass().getName());
             generator.writeObjectField(ElementName.ERROR_MESSAGE, record.getThrown().getMessage());
-            //generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(record.getThrown()));
             generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getFullStackTrace(record.getThrown()));
         }
 
