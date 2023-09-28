@@ -90,7 +90,7 @@ public class NewRelicLayout extends Layout {
             Throwable throwable = event.getThrowableInformation().getThrowable();
             generator.writeObjectField(ElementName.ERROR_CLASS, throwable.getClass().getName());
             generator.writeObjectField(ElementName.ERROR_MESSAGE, throwable.getMessage());
-            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(throwable));
+            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getFullStackTrace(throwable));
         }
 
         generator.writeEndObject();

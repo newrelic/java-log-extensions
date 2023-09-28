@@ -11,328 +11,101 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StackTraceTest {
+
+    private final static String STACKTRACE_LINE_PREFIX = "at com.newrelic.logging.core.StackTraceTestMethods.stackElement";
+    private final static String STACKTRACE_LINE_SUFFIX = "(StackTraceTestMethods.java:";
+    private final static String CAUSED_BY_STR = "Caused by: java.lang.RuntimeException: ~~ oops ~~";
+
     @Test
-    void stackTraceContents() {
+    public void getFullStackTrace_withNoCausedByAndDefaultMaxStackSize_generatesCorrectStackTraceString() {
         Throwable testData = null;
         try {
             StackTraceTestMethods.getException();
         } catch (Throwable t) {
             testData = t;
         }
+
         assertNotNull(testData);
-        String result = ExceptionUtil.getErrorStack(testData);
-        assertEquals("  at com.newrelic.logging.core.StackTraceTestMethods.stackElement300(StackTraceTestMethods.java:1214)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement299(StackTraceTestMethods.java:1210)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement298(StackTraceTestMethods.java:1206)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement297(StackTraceTestMethods.java:1202)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement296(StackTraceTestMethods.java:1198)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement295(StackTraceTestMethods.java:1194)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement294(StackTraceTestMethods.java:1190)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement293(StackTraceTestMethods.java:1186)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement292(StackTraceTestMethods.java:1182)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement291(StackTraceTestMethods.java:1178)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement290(StackTraceTestMethods.java:1174)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement289(StackTraceTestMethods.java:1170)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement288(StackTraceTestMethods.java:1166)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement287(StackTraceTestMethods.java:1162)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement286(StackTraceTestMethods.java:1158)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement285(StackTraceTestMethods.java:1154)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement284(StackTraceTestMethods.java:1150)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement283(StackTraceTestMethods.java:1146)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement282(StackTraceTestMethods.java:1142)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement281(StackTraceTestMethods.java:1138)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement280(StackTraceTestMethods.java:1134)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement279(StackTraceTestMethods.java:1130)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement278(StackTraceTestMethods.java:1126)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement277(StackTraceTestMethods.java:1122)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement276(StackTraceTestMethods.java:1118)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement275(StackTraceTestMethods.java:1114)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement274(StackTraceTestMethods.java:1110)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement273(StackTraceTestMethods.java:1106)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement272(StackTraceTestMethods.java:1102)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement271(StackTraceTestMethods.java:1098)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement270(StackTraceTestMethods.java:1094)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement269(StackTraceTestMethods.java:1090)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement268(StackTraceTestMethods.java:1086)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement267(StackTraceTestMethods.java:1082)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement266(StackTraceTestMethods.java:1078)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement265(StackTraceTestMethods.java:1074)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement264(StackTraceTestMethods.java:1070)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement263(StackTraceTestMethods.java:1066)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement262(StackTraceTestMethods.java:1062)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement261(StackTraceTestMethods.java:1058)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement260(StackTraceTestMethods.java:1054)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement259(StackTraceTestMethods.java:1050)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement258(StackTraceTestMethods.java:1046)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement257(StackTraceTestMethods.java:1042)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement256(StackTraceTestMethods.java:1038)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement255(StackTraceTestMethods.java:1034)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement254(StackTraceTestMethods.java:1030)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement253(StackTraceTestMethods.java:1026)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement252(StackTraceTestMethods.java:1022)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement251(StackTraceTestMethods.java:1018)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement250(StackTraceTestMethods.java:1014)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement249(StackTraceTestMethods.java:1010)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement248(StackTraceTestMethods.java:1006)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement247(StackTraceTestMethods.java:1002)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement246(StackTraceTestMethods.java:998)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement245(StackTraceTestMethods.java:994)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement244(StackTraceTestMethods.java:990)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement243(StackTraceTestMethods.java:986)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement242(StackTraceTestMethods.java:982)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement241(StackTraceTestMethods.java:978)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement240(StackTraceTestMethods.java:974)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement239(StackTraceTestMethods.java:970)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement238(StackTraceTestMethods.java:966)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement237(StackTraceTestMethods.java:962)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement236(StackTraceTestMethods.java:958)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement235(StackTraceTestMethods.java:954)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement234(StackTraceTestMethods.java:950)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement233(StackTraceTestMethods.java:946)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement232(StackTraceTestMethods.java:942)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement231(StackTraceTestMethods.java:938)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement230(StackTraceTestMethods.java:934)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement229(StackTraceTestMethods.java:930)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement228(StackTraceTestMethods.java:926)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement227(StackTraceTestMethods.java:922)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement226(StackTraceTestMethods.java:918)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement225(StackTraceTestMethods.java:914)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement224(StackTraceTestMethods.java:910)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement223(StackTraceTestMethods.java:906)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement222(StackTraceTestMethods.java:902)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement221(StackTraceTestMethods.java:898)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement220(StackTraceTestMethods.java:894)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement219(StackTraceTestMethods.java:890)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement218(StackTraceTestMethods.java:886)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement217(StackTraceTestMethods.java:882)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement216(StackTraceTestMethods.java:878)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement215(StackTraceTestMethods.java:874)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement214(StackTraceTestMethods.java:870)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement213(StackTraceTestMethods.java:866)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement212(StackTraceTestMethods.java:862)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement211(StackTraceTestMethods.java:858)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement210(StackTraceTestMethods.java:854)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement209(StackTraceTestMethods.java:850)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement208(StackTraceTestMethods.java:846)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement207(StackTraceTestMethods.java:842)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement206(StackTraceTestMethods.java:838)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement205(StackTraceTestMethods.java:834)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement204(StackTraceTestMethods.java:830)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement203(StackTraceTestMethods.java:826)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement202(StackTraceTestMethods.java:822)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement201(StackTraceTestMethods.java:818)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement200(StackTraceTestMethods.java:814)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement199(StackTraceTestMethods.java:810)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement198(StackTraceTestMethods.java:806)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement197(StackTraceTestMethods.java:802)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement196(StackTraceTestMethods.java:798)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement195(StackTraceTestMethods.java:794)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement194(StackTraceTestMethods.java:790)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement193(StackTraceTestMethods.java:786)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement192(StackTraceTestMethods.java:782)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement191(StackTraceTestMethods.java:778)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement190(StackTraceTestMethods.java:774)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement189(StackTraceTestMethods.java:770)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement188(StackTraceTestMethods.java:766)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement187(StackTraceTestMethods.java:762)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement186(StackTraceTestMethods.java:758)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement185(StackTraceTestMethods.java:754)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement184(StackTraceTestMethods.java:750)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement183(StackTraceTestMethods.java:746)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement182(StackTraceTestMethods.java:742)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement181(StackTraceTestMethods.java:738)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement180(StackTraceTestMethods.java:734)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement179(StackTraceTestMethods.java:730)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement178(StackTraceTestMethods.java:726)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement177(StackTraceTestMethods.java:722)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement176(StackTraceTestMethods.java:718)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement175(StackTraceTestMethods.java:714)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement174(StackTraceTestMethods.java:710)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement173(StackTraceTestMethods.java:706)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement172(StackTraceTestMethods.java:702)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement171(StackTraceTestMethods.java:698)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement170(StackTraceTestMethods.java:694)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement169(StackTraceTestMethods.java:690)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement168(StackTraceTestMethods.java:686)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement167(StackTraceTestMethods.java:682)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement166(StackTraceTestMethods.java:678)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement165(StackTraceTestMethods.java:674)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement164(StackTraceTestMethods.java:670)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement163(StackTraceTestMethods.java:666)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement162(StackTraceTestMethods.java:662)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement161(StackTraceTestMethods.java:658)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement160(StackTraceTestMethods.java:654)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement159(StackTraceTestMethods.java:650)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement158(StackTraceTestMethods.java:646)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement157(StackTraceTestMethods.java:642)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement156(StackTraceTestMethods.java:638)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement155(StackTraceTestMethods.java:634)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement154(StackTraceTestMethods.java:630)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement153(StackTraceTestMethods.java:626)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement152(StackTraceTestMethods.java:622)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement151(StackTraceTestMethods.java:618)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement150(StackTraceTestMethods.java:614)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement149(StackTraceTestMethods.java:610)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement148(StackTraceTestMethods.java:606)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement147(StackTraceTestMethods.java:602)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement146(StackTraceTestMethods.java:598)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement145(StackTraceTestMethods.java:594)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement144(StackTraceTestMethods.java:590)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement143(StackTraceTestMethods.java:586)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement142(StackTraceTestMethods.java:582)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement141(StackTraceTestMethods.java:578)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement140(StackTraceTestMethods.java:574)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement139(StackTraceTestMethods.java:570)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement138(StackTraceTestMethods.java:566)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement137(StackTraceTestMethods.java:562)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement136(StackTraceTestMethods.java:558)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement135(StackTraceTestMethods.java:554)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement134(StackTraceTestMethods.java:550)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement133(StackTraceTestMethods.java:546)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement132(StackTraceTestMethods.java:542)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement131(StackTraceTestMethods.java:538)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement130(StackTraceTestMethods.java:534)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement129(StackTraceTestMethods.java:530)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement128(StackTraceTestMethods.java:526)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement127(StackTraceTestMethods.java:522)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement126(StackTraceTestMethods.java:518)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement125(StackTraceTestMethods.java:514)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement124(StackTraceTestMethods.java:510)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement123(StackTraceTestMethods.java:506)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement122(StackTraceTestMethods.java:502)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement121(StackTraceTestMethods.java:498)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement120(StackTraceTestMethods.java:494)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement119(StackTraceTestMethods.java:490)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement118(StackTraceTestMethods.java:486)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement117(StackTraceTestMethods.java:482)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement116(StackTraceTestMethods.java:478)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement115(StackTraceTestMethods.java:474)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement114(StackTraceTestMethods.java:470)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement113(StackTraceTestMethods.java:466)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement112(StackTraceTestMethods.java:462)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement111(StackTraceTestMethods.java:458)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement110(StackTraceTestMethods.java:454)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement109(StackTraceTestMethods.java:450)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement108(StackTraceTestMethods.java:446)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement107(StackTraceTestMethods.java:442)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement106(StackTraceTestMethods.java:438)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement105(StackTraceTestMethods.java:434)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement104(StackTraceTestMethods.java:430)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement103(StackTraceTestMethods.java:426)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement102(StackTraceTestMethods.java:422)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement101(StackTraceTestMethods.java:418)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement100(StackTraceTestMethods.java:414)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement99(StackTraceTestMethods.java:410)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement98(StackTraceTestMethods.java:406)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement97(StackTraceTestMethods.java:402)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement96(StackTraceTestMethods.java:398)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement95(StackTraceTestMethods.java:394)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement94(StackTraceTestMethods.java:390)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement93(StackTraceTestMethods.java:386)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement92(StackTraceTestMethods.java:382)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement91(StackTraceTestMethods.java:378)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement90(StackTraceTestMethods.java:374)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement89(StackTraceTestMethods.java:370)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement88(StackTraceTestMethods.java:366)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement87(StackTraceTestMethods.java:362)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement86(StackTraceTestMethods.java:358)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement85(StackTraceTestMethods.java:354)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement84(StackTraceTestMethods.java:350)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement83(StackTraceTestMethods.java:346)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement82(StackTraceTestMethods.java:342)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement81(StackTraceTestMethods.java:338)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement80(StackTraceTestMethods.java:334)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement79(StackTraceTestMethods.java:330)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement78(StackTraceTestMethods.java:326)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement77(StackTraceTestMethods.java:322)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement76(StackTraceTestMethods.java:318)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement75(StackTraceTestMethods.java:314)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement74(StackTraceTestMethods.java:310)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement73(StackTraceTestMethods.java:306)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement72(StackTraceTestMethods.java:302)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement71(StackTraceTestMethods.java:298)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement70(StackTraceTestMethods.java:294)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement69(StackTraceTestMethods.java:290)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement68(StackTraceTestMethods.java:286)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement67(StackTraceTestMethods.java:282)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement66(StackTraceTestMethods.java:278)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement65(StackTraceTestMethods.java:274)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement64(StackTraceTestMethods.java:270)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement63(StackTraceTestMethods.java:266)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement62(StackTraceTestMethods.java:262)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement61(StackTraceTestMethods.java:258)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement60(StackTraceTestMethods.java:254)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement59(StackTraceTestMethods.java:250)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement58(StackTraceTestMethods.java:246)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement57(StackTraceTestMethods.java:242)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement56(StackTraceTestMethods.java:238)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement55(StackTraceTestMethods.java:234)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement54(StackTraceTestMethods.java:230)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement53(StackTraceTestMethods.java:226)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement52(StackTraceTestMethods.java:222)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement51(StackTraceTestMethods.java:218)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement50(StackTraceTestMethods.java:214)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement49(StackTraceTestMethods.java:210)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement48(StackTraceTestMethods.java:206)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement47(StackTraceTestMethods.java:202)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement46(StackTraceTestMethods.java:198)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement45(StackTraceTestMethods.java:194)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement44(StackTraceTestMethods.java:190)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement43(StackTraceTestMethods.java:186)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement42(StackTraceTestMethods.java:182)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement41(StackTraceTestMethods.java:178)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement40(StackTraceTestMethods.java:174)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement39(StackTraceTestMethods.java:170)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement38(StackTraceTestMethods.java:166)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement37(StackTraceTestMethods.java:162)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement36(StackTraceTestMethods.java:158)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement35(StackTraceTestMethods.java:154)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement34(StackTraceTestMethods.java:150)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement33(StackTraceTestMethods.java:146)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement32(StackTraceTestMethods.java:142)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement31(StackTraceTestMethods.java:138)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement30(StackTraceTestMethods.java:134)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement29(StackTraceTestMethods.java:130)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement28(StackTraceTestMethods.java:126)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement27(StackTraceTestMethods.java:122)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement26(StackTraceTestMethods.java:118)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement25(StackTraceTestMethods.java:114)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement24(StackTraceTestMethods.java:110)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement23(StackTraceTestMethods.java:106)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement22(StackTraceTestMethods.java:102)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement21(StackTraceTestMethods.java:98)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement20(StackTraceTestMethods.java:94)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement19(StackTraceTestMethods.java:90)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement18(StackTraceTestMethods.java:86)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement17(StackTraceTestMethods.java:82)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement16(StackTraceTestMethods.java:78)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement15(StackTraceTestMethods.java:74)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement14(StackTraceTestMethods.java:70)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement13(StackTraceTestMethods.java:66)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement12(StackTraceTestMethods.java:62)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement11(StackTraceTestMethods.java:58)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement10(StackTraceTestMethods.java:54)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement9(StackTraceTestMethods.java:50)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement8(StackTraceTestMethods.java:46)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement7(StackTraceTestMethods.java:42)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement6(StackTraceTestMethods.java:38)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement5(StackTraceTestMethods.java:34)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement4(StackTraceTestMethods.java:30)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement3(StackTraceTestMethods.java:26)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement2(StackTraceTestMethods.java:22)\n"
-                        + "  at com.newrelic.logging.core.StackTraceTestMethods.stackElement1(StackTraceTestMethods.java:18)\n",
-                result);
+        String stackTraceStr = ExceptionUtil.getFullStackTrace(testData);
+        String[] stackTraceLines = stackTraceStr.split("\n");
+
+        assertEquals(300, stackTraceLines.length);
+        for (int idx = 0; idx < 300; idx++) {
+             assertTrue(stackTraceLines[idx].contains(STACKTRACE_LINE_PREFIX + (300 - idx) + STACKTRACE_LINE_SUFFIX));
+        }
+    }
+
+    @Test
+    public void getFullStackTrace_withCausedByAndDefaultMaxStackSize_generatesCorrectStackTraceString() {
+        Throwable testData = null;
+        try {
+            StackTraceTestMethods.getExceptionWithCausedBy();
+        } catch (Throwable t) {
+            testData = t;
+        }
+
+        assertNotNull(testData);
+        String stackTraceStr = ExceptionUtil.getFullStackTrace(testData);
+        String[] stackTraceLines = stackTraceStr.split("\n");
+
+        assertNotNull(stackTraceStr);
+        assertTrue(stackTraceStr.contains(CAUSED_BY_STR));
+        assertEquals(300, stackTraceLines.length);
+    }
+
+    @Test
+    public void getFullStackTrace_withNoCausedByAndMaxStackSizeGreaterThanStackTrace_generatesCorrectStackTraceString() {
+        System.setProperty(LogExtensionConfig.MAX_STACK_SIZE_SYS_PROP, "5000");
+        Throwable testData = null;
+        try {
+            StackTraceTestMethods.getException();
+        } catch (Throwable t) {
+            testData = t;
+        }
+
+        assertNotNull(testData);
+        String stackTraceStr = ExceptionUtil.getFullStackTrace(testData);
+        String[] stackTraceLines = stackTraceStr.split("\n");
+
+        assertTrue(stackTraceLines.length > 300);
+
+        System.clearProperty(LogExtensionConfig.MAX_STACK_SIZE_SYS_PROP);
+    }
+
+    @Test
+    public void transformLogbackStackTraceString_withEmptyString_returnsNull() {
+        assertNull(ExceptionUtil.transformLogbackStackTraceString(""));
+        assertNull(ExceptionUtil.transformLogbackStackTraceString(null));
+    }
+
+    @Test
+    public void transformLogbackStackTraceString_withValidTrace_returnsTransformedString() {
+        String traceSample = "java.lang.Exception: ~~ oops ~~\n" +
+                "  at com.newrelic.logging.logback.NewRelicLogbackTests.givenALoggingEventWithExceptionData(NewRelicLogbackTests.java:143)\n" +
+                "  at com.newrelic.logging.logback.NewRelicLogbackTests.shouldAppendErrorDataCorrectly(NewRelicLogbackTests.java:86)\n" +
+                "  at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n" +
+                "  at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\n" +
+                "  at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n" +
+                "  at java.lang.reflect.Method.invoke(Method.java:498)\n" +
+                "Caused by: java.lang.RuntimeException: ~~ oops2! ~~\n" +
+                "  at com.foo(MyMethod.java:135)\n";
+
+        String transformedTrace = ExceptionUtil.transformLogbackStackTraceString(traceSample);
+        String[] stackTraceLines = transformedTrace.split("\n");
+
+        assertEquals(8, stackTraceLines.length);
     }
 
     @Test
     void shortStackTraceContents() {
         Throwable testData = new ShortStackException();
         assertNotNull(testData);
-        String result = ExceptionUtil.getErrorStack(testData);
-        assertEquals("  at com.newrelic.logging.core.StackTraceTest.shortStackTraceContents(StackTraceTest.java:331)\n",
-                result);
+        String result = ExceptionUtil.getFullStackTrace(testData);
+        assertTrue(result.contains("  at com.newrelic.logging.core.StackTraceTest.shortStackTraceContents(StackTraceTest.java:"));
     }
 
     static class ShortStackException extends Throwable {

@@ -34,11 +34,16 @@ MDC data will be added to log events with a `context.` prefix to distinguish it 
 collisions with New Relic specific context keys.
 
 ### Exception Stack Trace Size
+**Note:** The log extensions now have the ability to capture the entire stack trace - specifically any `caused by` sections.
+Prior versions of the extension only reported the trace for the thrown exception and ignored any nested `caused by` `Throwables`.
+
 You can configure the logging extension to control the max stack trace size for exceptions added to log events.
 
 Default max stack trace size is `300`. It is recommended that you do not exceed this value or data could be dropped or truncated as well as
 lead to higher log event ingest costs. Max stack trace size can be configured by environment variable (`NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=integer`)
 or system property (`-Dnewrelic.log_extension.max_stack_size=integer`).
+
+Explicitly setting this property to `0` will not impose a maximum size constraint on the stack trace size.
 
 ## Support
 
