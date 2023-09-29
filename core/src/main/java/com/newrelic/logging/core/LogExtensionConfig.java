@@ -17,7 +17,7 @@ public class LogExtensionConfig {
 
     /**
      * Get an int representing the max stack size for errors that should be added to logs. Explicitly setting the
-     * value to 0 not impose a maximum size constraint on the stack trace size.
+     * value to 0 will not impose a maximum size constraint on the stack trace size.
      * <p>
      * Precedence: Env var > Sys prop > Default
      *
