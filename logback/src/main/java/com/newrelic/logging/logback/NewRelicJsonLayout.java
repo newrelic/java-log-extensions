@@ -8,6 +8,7 @@ package com.newrelic.logging.logback;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.classic.spi.ThrowableProxyUtil;
 import ch.qos.logback.core.LayoutBase;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
@@ -95,16 +96,7 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         if (proxy != null) {
             generator.writeObjectField(ElementName.ERROR_CLASS, proxy.getClassName());
             generator.writeObjectField(ElementName.ERROR_MESSAGE, proxy.getMessage());
-
-            StackTraceElementProxy[] stackProxy = proxy.getStackTraceElementProxyArray();
-            if (stackProxy != null && stackProxy.length > 0) {
-                List<StackTraceElement> elements = new ArrayList<>(maxStackSize);
-                for (int i = 0; i < maxStackSize && i < stackProxy.length; i++) {
-                    elements.add(stackProxy[i].getStackTraceElement());
-                }
-
-                generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.getErrorStack(elements.toArray(new StackTraceElement[0]), maxStackSize));
-            }
+            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.transformLogbackStackTraceString(ThrowableProxyUtil.asString(proxy)));
         }
 
         generator.writeEndObject();

@@ -5,32 +5,42 @@
 
 package com.newrelic.logging.core;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import java.util.Arrays;
+
 import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
 
 public class ExceptionUtil {
     public static final int MAX_STACK_SIZE_DEFAULT = 300;
-    public static String getErrorStack(Throwable throwable) {
+
+    public static String getFullStackTrace(Throwable throwable) {
         if (throwable == null) {
             return null;
         }
 
-        StackTraceElement[] stack = throwable.getStackTrace();
-        return getErrorStack(stack);
+        return getStackTraceStringFromFramesArray(ExceptionUtils.getStackFrames(throwable));
     }
 
-    public static String getErrorStack(StackTraceElement[] stack) {
-        return getErrorStack(stack, getMaxStackSize());
-    }
-
-    public static String getErrorStack(StackTraceElement[] stack, Integer maxStackSize) {
-        if (stack == null || stack.length == 0) {
+    public static String transformLogbackStackTraceString(String trace) {
+        if (trace == null || trace.length() == 0) {
             return null;
         }
 
-        StringBuilder stackBuilder = new StringBuilder();
-        for(int i = 0; i < Math.min(maxStackSize, stack.length); i++) {
-            stackBuilder.append("  at ").append(stack[i].toString()).append("\n");
+        return getStackTraceStringFromFramesArray(trace.split("\n"));
+    }
+
+    private static String getStackTraceStringFromFramesArray(String[] frames) {
+        int maxStackSize = getMaxStackSize();
+
+        //We need to truncate the stacktrace based on the desired max stacktrace size, as well as remove the first line
+        //of the returned trace (the "message"), since this is already captured in the error.message attribute.
+        if (frames.length > maxStackSize) {
+            frames = Arrays.copyOfRange(frames, 1, maxStackSize + 1);
+        } else {
+            frames = Arrays.copyOfRange(frames, 1, frames.length);
         }
-        return stackBuilder.toString();
+
+        return String.join("\n", frames).replace("\tat", "  at") + "\n";
     }
 }

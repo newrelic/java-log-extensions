@@ -21,6 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LogExtensionConfigTest {
 
     @Test
+    void getMaxStackSize_withValueOfZeroAndSetAsSysProp_returnsMaxInt() {
+        System.setProperty(MAX_STACK_SIZE_SYS_PROP, String.valueOf(0));
+        assertEquals(Integer.MAX_VALUE, LogExtensionConfig.getMaxStackSize());
+        System.clearProperty(MAX_STACK_SIZE_SYS_PROP);
+    }
+
+    @Test
+    void getMaxStackSize_withValueOfZeroAndSetAsEnvVar_returnsMaxInt() throws Exception {
+        assertEquals(Integer.MAX_VALUE, withEnvironmentVariable(MAX_STACK_SIZE_ENV_VAR, String.valueOf(0)).execute(LogExtensionConfig::getMaxStackSize));
+    }
+
+    @Test
     void testGetMaxStackSizeDefault() {
         int actualSize = LogExtensionConfig.getMaxStackSize();
         assertEquals(MAX_STACK_SIZE_DEFAULT, actualSize);

@@ -10,6 +10,14 @@ public class StackTraceTestMethods {
         stackElement0();
     }
 
+    public static void getExceptionWithCausedBy() {
+        try {
+            stackElement0();
+        } catch (Exception e) {
+            throw new RuntimeException("top level oops", e);
+        }
+    }
+
     private static void stackElement0() {
         stackElement1();
     }

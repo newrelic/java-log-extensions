@@ -16,7 +16,8 @@ public class LogExtensionConfig {
     public static final boolean ADD_MDC_DEFAULT = false;
 
     /**
-     * Get an int representing the max stack size for errors that should be added to logs
+     * Get an int representing the max stack size for errors that should be added to logs. Explicitly setting the
+     * value to 0 will not impose a maximum size constraint on the stack trace size.
      * <p>
      * Precedence: Env var > Sys prop > Default
      *
@@ -25,14 +26,17 @@ public class LogExtensionConfig {
     public static int getMaxStackSize() {
         String envVar = System.getenv(MAX_STACK_SIZE_ENV_VAR);
         String sysProp = System.getProperty(MAX_STACK_SIZE_SYS_PROP);
+        int parsedValue;
 
         if (isInteger(envVar)) {
-            return Integer.parseInt(envVar);
+            parsedValue = Integer.parseInt(envVar);
         } else if (isInteger(sysProp)) {
-            return Integer.parseInt(sysProp);
+            parsedValue = Integer.parseInt(sysProp);
         } else {
-            return ExceptionUtil.MAX_STACK_SIZE_DEFAULT;
+            parsedValue = ExceptionUtil.MAX_STACK_SIZE_DEFAULT;
         }
+
+        return (parsedValue == 0 ? Integer.MAX_VALUE : parsedValue);
     }
 
     /**
