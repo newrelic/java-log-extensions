@@ -40,13 +40,13 @@ public class NewRelicAsyncAppender extends AsyncAppender {
     protected void preprocess(ILoggingEvent eventObject) {
         Map<String, String> linkingMetadata = agentSupplier.get().getLinkingMetadata();
         // NR linking metadata is added to the MDC map
-        if (!isNoOpMDC) {
+        if (!IsNoOpMDCHolder.isNoOpMDC) {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
                 MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
         }
         super.preprocess(eventObject);
-        if (isNoOpMDC) {
+        if (IsNoOpMDCHolder.isNoOpMDC) {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
                 /*
                  * This only works if there is at least one entry in the MDC map. If the MDC map is empty when
@@ -59,8 +59,14 @@ public class NewRelicAsyncAppender extends AsyncAppender {
         }
     }
 
+    /*
+    Due to issues with simultaneous classloading of the NRAsyncAppender and the Logback classes,
+    the isNoOpMDC field is wrapped to load it lazily. Visible for testing.
+     */
+    static class IsNoOpMDCHolder {
+        static boolean isNoOpMDC = MDC.getMDCAdapter() instanceof NOPMDCAdapter;
+    }
+
     //visible for testing
     public static Supplier<Agent> agentSupplier = NewRelic::getAgent;
-    @SuppressWarnings("WeakerAccess") //visible for testing
-    static boolean isNoOpMDC = MDC.getMDCAdapter() instanceof NOPMDCAdapter;
 }
