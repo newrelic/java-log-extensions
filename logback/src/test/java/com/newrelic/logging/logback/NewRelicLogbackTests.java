@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.mockito.Mockito;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.BufferedReader;
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -60,8 +62,8 @@ class NewRelicLogbackTests {
     void shouldAllWorkCorrectlyEvenWithoutMDC() throws Throwable {
         givenMockAgentData();
         givenARedirectedAppender();
-        givenMDCIsANoOp();
         givenALoggingEventWithMDCDisabled();
+        givenMDCIsANoOp();
         whenTheEventIsAppended();
         thenMockAgentDataIsInTheMessage();
         thenJsonLayoutWasUsed();
@@ -129,13 +131,16 @@ class NewRelicLogbackTests {
     }
 
     private void givenMDCIsANoOp() {
-        NewRelicAsyncAppender.isNoOpMDC = true;
+        NewRelicAsyncAppender.IsNoOpMDCHolder.isNoOpMDC = true;
+        // Wipe the MDC to mimic a NOPMDCAdapter.
+        event.setMDCPropertyMap(new HashMap<>());
     }
 
     private void givenALoggingEvent() {
         event = new LoggingEvent();
         event.setMessage("test_error_message");
         event.setLevel(Level.ERROR);
+        event.setLoggerContext((LoggerContext) LoggerFactory.getILoggerFactory());
     }
 
     private void givenALoggingEventWithExceptionData() {
@@ -283,7 +288,7 @@ class NewRelicLogbackTests {
     void setUp() throws Exception {
         // Clear MDC data before each test
         MDC.clear();
-        isNoOpMDC = NewRelicAsyncAppender.isNoOpMDC;
+        isNoOpMDC = NewRelicAsyncAppender.IsNoOpMDCHolder.isNoOpMDC;
         outputStream = new PipedOutputStream();
         PipedInputStream inputStream = new PipedInputStream(outputStream);
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -293,7 +298,7 @@ class NewRelicLogbackTests {
     void tearDown() throws Exception {
         // Clear MDC data before each test
         MDC.clear();
-        NewRelicAsyncAppender.isNoOpMDC = isNoOpMDC;
+        NewRelicAsyncAppender.IsNoOpMDCHolder.isNoOpMDC = isNoOpMDC;
         appender.stop();
         appender.detachAndStopAllAppenders();
         outputStream.close();

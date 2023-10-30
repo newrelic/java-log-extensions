@@ -27,6 +27,8 @@ dependencies {
 
     includeInJar(project(":core"))
 
+    testImplementation("ch.qos.logback:logback-core:1.3.9");
+    testImplementation("ch.qos.logback:logback-classic:1.3.9");
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     testImplementation("com.google.guava:guava:30.0-jre")
     testImplementation("org.mockito:mockito-core:3.4.4")
