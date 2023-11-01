@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.1.0
+* Exception Stack Traces
+  * Capture the full (nested) stack trace for exceptions.  
+  * Add configuration option to allow unlimited stack trace size, by setting the maximum stack trace option to `0`.
+    * This can be configured via
+      * System property: `-Dnewrelic.log_extension.max_stack_size=0`
+      * Environment variable: `NEW_RELIC_LOG_EXTENSION_MAX_STACK_SIZE=0`
+* Logback MDC (Mapped Diagnostic Context)
+  * Fix bug where MDC values were not retained when using the extension with Logback v1.4.8 and higher.  
+
 ## 3.0.0
 * Exception Stack Trace Size - this has been changed from a default of `10` to `300`. This applies to all logging libraries supported by the `java-log-extension` project.
     * This is configurable via:
