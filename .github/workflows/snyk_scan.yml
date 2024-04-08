@@ -21,7 +21,7 @@ jobs:
           ref: 'main'
           
       - name: Run Snyk To Check For Vulnerabilities
-        uses: snyk/actions/gradle@master
+        uses: snyk/actions/gradle-jdk11@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
