@@ -17,6 +17,7 @@ repositories {
 }
 
 val includeInJar: Configuration by configurations.creating
+includeInJar.exclude(group = "org.apache.commons")
 configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
