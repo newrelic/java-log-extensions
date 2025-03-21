@@ -3,6 +3,7 @@ include 'log4j1'
 include 'log4j2'
 include 'logback'
 include 'logback11'
+include 'logback13'
 include 'jul'
 include 'dropwizard'
 include 'core'
@@ -16,3 +17,4 @@ include 'examples:jul-app'
 include 'examples:dropwizard-app'
 
 include 'performance:log4j2-perf'
+
