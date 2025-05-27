@@ -21,39 +21,39 @@
         <Class name="com.newrelic.logging.logback13.NewRelicJsonLayoutTest"/>
     </Match>
 
-    <Match>
-        <!--
-        Logback 1.3.x store MDC in ContextMap instead of ThreadLocal storage.
-        This change requires update to MDC handling, which could possibly trigger false positives.
-        -->
-        <Bug pattern="MS_EXPOSE_REP"/>
-        <Class name="com.newrelic.logging.logback13.NewRelicAsyncAppender"/>
-    </Match>
+<!--    <Match>-->
+<!--        &lt;!&ndash;-->
+<!--        Logback 1.3.x store MDC in ContextMap instead of ThreadLocal storage.-->
+<!--        This change requires update to MDC handling, which could possibly trigger false positives.-->
+<!--        &ndash;&gt;-->
+<!--        <Bug pattern="MS_EXPOSE_REP"/>-->
+<!--        <Class name="com.newrelic.logging.logback13.NewRelicAsyncAppender"/>-->
+<!--    </Match>-->
 
-    <Match>
-        <!--
-        Prevent false positives due to proper synchronization in Logback 1.3.x's async logging.
-        The appender correctly handles flushing and processing of log events.
-        -->
-        <Bug pattern="SWL_SLEEP_WITH_LOCK_HELD"/>
-        <Class name="com.newrelic.logging.logback13.*"/>
-    </Match>
+<!--    <Match>-->
+<!--        &lt;!&ndash;-->
+<!--        Prevent false positives due to proper synchronization in Logback 1.3.x's async logging.-->
+<!--        The appender correctly handles flushing and processing of log events.-->
+<!--        &ndash;&gt;-->
+<!--        <Bug pattern="SWL_SLEEP_WITH_LOCK_HELD"/>-->
+<!--        <Class name="com.newrelic.logging.logback13.*"/>-->
+<!--    </Match>-->
 
-    <Match>
-        <!--
-        Allow proper handling of ContextMap MDC (since it replaced using the MCDAdapter).
-        Ensures logging context is stored  at the LoggerContext level, instead of ThreadLocal.
-        -->
-        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
-        <Class name="com.newrelic.logging.logback13.NewRelicAsyncAppender"/>
-    </Match>
+<!--    <Match>-->
+<!--        &lt;!&ndash;-->
+<!--        Allow proper handling of ContextMap MDC (since it replaced using the MCDAdapter).-->
+<!--        Ensures logging context is stored  at the LoggerContext level, instead of ThreadLocal.-->
+<!--        &ndash;&gt;-->
+<!--        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>-->
+<!--        <Class name="com.newrelic.logging.logback13.NewRelicAsyncAppender"/>-->
+<!--    </Match>-->
 
-    <Match>
-        <!--
-        Prevent SpotBugs from flagging valid JSON encoding operations incorrectly.
-        Log events are properly formated before being written to the output stream.
-        -->
-        <Bug pattern="NP_NULL_ON_SOME_PATH"/>
-        <Class name="com.newrelic.logging.logback13.NewRelicAsyncJsonEncoder"/>
-    </Match>
+<!--    <Match>-->
+<!--        &lt;!&ndash;-->
+<!--        Prevent SpotBugs from flagging valid JSON encoding operations incorrectly.-->
+<!--        Log events are properly formated before being written to the output stream.-->
+<!--        &ndash;&gt;-->
+<!--        <Bug pattern="NP_NULL_ON_SOME_PATH"/>-->
+<!--        <Class name="com.newrelic.logging.logback13.NewRelicAsyncJsonEncoder"/>-->
+<!--    </Match>-->
 </FindBugsFilter>

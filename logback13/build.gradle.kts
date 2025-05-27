@@ -6,7 +6,7 @@ plugins {
 group = "com.newrelic.logging"
 
 // -Prelease=true will render a non-snapshot version
-// All other values (include unset) will render a snapshot version.
+// All other values (including unset) will render a snapshot version.
 val release: String? by project
 val releaseVersion: String by project
 version = releaseVersion + if ("true" == release) "" else "-SNAPSHOT"
@@ -21,16 +21,12 @@ includeInJar.exclude(group = "org.apache.commons")
 configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
-    implementation("org.slf4j:slf4j-api:2.0.7")
     implementation("com.fasterxml.jackson.core:jackson-core:2.11.1")
     implementation("ch.qos.logback:logback-core:1.3.15")
     implementation("ch.qos.logback:logback-classic:1.3.15")
     implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
-
     includeInJar(project(":core"))
 
-    testImplementation("ch.qos.logback:logback-core:1.3.15");
-    testImplementation("ch.qos.logback:logback-classic:1.3.15");
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     testImplementation("com.google.guava:guava:30.0-jre")
     testImplementation("org.mockito:mockito-core:3.4.4")
@@ -66,7 +62,7 @@ tasks.register<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
 }
 
-//apply(from = "$rootDir/gradle/publisher.gradle.kts")
+apply(from = "$rootDir/gradle/publish.gradle.kts")
 
 tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
     excludeFilter.set(file("spotbugs-filter.xml"))

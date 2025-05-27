@@ -2,16 +2,17 @@
  * Copyright 2025 New Relic Corporation. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
-
 package com.newrelic.logging.logback13;
 
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
 import com.newrelic.api.agent.Agent;
 import com.newrelic.api.agent.NewRelic;
 import org.slf4j.MDC;
 import org.slf4j.helpers.NOPMDCAdapter;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -48,32 +49,27 @@ public class NewRelicAsyncAppender extends AsyncAppender {
         Map<String, String> linkingMetadata = agentSupplier.get().getLinkingMetadata();
 
         // NR linking metadata is added to the MDC map, if MDC is enabled
-        if (!IsNoOpMDCHolder.isNoOpMDC) {
+        if (!isNoOpMDC) {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
                 MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
-            super.preprocess(eventObject);
-        } else {
+        }
+        super.preprocess(eventObject);
+        /*
+         * In logback-1.3.x, calling eventObject.getMDCPropertyMap() returns an immutable map (Collections.emptyMap()).
+         * To add New Relic linking metadata to the event, we first check if MDC is disabled (isNoOpMDC). Then we create
+         * a new MDC map (that is mutable) and add the linking metadata and call setMDCPropertyMap() to set the new map.
+         */
+        if (isNoOpMDC) {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
-                /*
-                 * This only works if there is at least one entry in the MDC map. If the MDC map is empty when
-                 * calling eventObject.getMDCPropertyMap() it simply returns Collections.emptyMap() which is
-                 * immutable. Calling put() on the immutable map causes a java.lang.UnsupportedOperationException
-                 * which results in the NR linking metadata never being added.
-                 */
                 eventObject.getMDCPropertyMap().put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
         }
     }
 
-    /*
-    Due to issues with simultaneous classloading of the NRAsyncAppender and the Logback classes,
-    the isNoOpMDC field is wrapped to load it lazily. Visible for testing.
-     */
-    public static class IsNoOpMDCHolder {
-        public static boolean isNoOpMDC = MDC.getMDCAdapter() instanceof NOPMDCAdapter;
-    }
-
     //visible for testing
     public static Supplier<Agent> agentSupplier = NewRelic::getAgent;
+    @SuppressWarnings("WeakerAccess") //visible for testing
+    public static boolean isNoOpMDC = MDC.getMDCAdapter() instanceof NOPMDCAdapter;
 }
+

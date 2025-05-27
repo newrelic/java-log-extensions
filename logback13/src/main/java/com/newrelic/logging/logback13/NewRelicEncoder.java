@@ -38,14 +38,9 @@ public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     @Override
     public byte[] encode(ILoggingEvent event) {
         String laidOutResult = layout.doLayout(event);
-        ByteBuffer results = StandardCharsets.UTF_8.encode(laidOutResult);
-        byte[] resultArray = results.array();
-        int i = resultArray.length - 1;
-        while (i > 0 && resultArray[i - 1] == '\0') {
-            i--;
-        }
-        return Arrays.copyOfRange(resultArray, 0, i);
+        return laidOutResult.getBytes(StandardCharsets.UTF_8);
     }
+
 
     @Override
     public void start() {

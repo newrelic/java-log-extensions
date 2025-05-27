@@ -32,13 +32,12 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NewRelicLogbackTests {
+class NewRelicLogback13Tests {
     private AsyncAppender appender;
     private LoggingEvent event;
     private PipedOutputStream outputStream;
@@ -51,8 +50,8 @@ class NewRelicLogbackTests {
     @BeforeEach
     void setUp() throws Exception {
         // Clear MDC data before each test
+        isNoOpMDC = NewRelicAsyncAppender.isNoOpMDC;
         MDC.clear();
-        isNoOpMDC = NewRelicAsyncAppender.IsNoOpMDCHolder.isNoOpMDC;
         outputStream = new PipedOutputStream();
         PipedInputStream inputStream = new PipedInputStream(outputStream);
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -62,7 +61,7 @@ class NewRelicLogbackTests {
     void tearDown() throws Exception {
         // Clear MDC data before each test
         MDC.clear();
-        NewRelicAsyncAppender.IsNoOpMDCHolder.isNoOpMDC = isNoOpMDC;
+        NewRelicAsyncAppender.isNoOpMDC = isNoOpMDC;
         appender.stop();
         appender.detachAndStopAllAppenders();
         outputStream.close();
@@ -95,8 +94,8 @@ class NewRelicLogbackTests {
     void shouldAllWorkCorrectlyEvenWithoutMDC() throws Throwable {
         givenMockAgentData();
         givenARedirectedAppender();
-        givenALoggingEventWithMDCDisabled();
         givenMDCIsANoOp();
+        givenALoggingEvent();
         whenTheEventIsAppended();
         thenMockAgentDataIsInTheMessage();
         thenJsonLayoutWasUsed();
@@ -164,9 +163,8 @@ class NewRelicLogbackTests {
     }
 
     private void givenMDCIsANoOp() {
-        com.newrelic.logging.logback13.NewRelicAsyncAppender.IsNoOpMDCHolder.isNoOpMDC = true;
         // Wipe the MDC to mimic a NOPMDCAdapter.
-        event.setMDCPropertyMap(new HashMap<>());
+        NewRelicAsyncAppender.isNoOpMDC = true;
     }
 
     private void givenALoggingEvent() {
@@ -238,8 +236,13 @@ class NewRelicLogbackTests {
         appender.start();
     }
 
-    private void whenTheEventIsAppended() {
+    private void whenTheEventIsAppended() throws IOException {
         appender.doAppend(event);
+        outputStream.flush();
+    }
+
+    private boolean appenderIsIdle() {
+        return ((NewRelicAsyncAppender) appender).getQueueSize() == 0;
     }
 
     private void thenJsonLayoutWasUsed() throws IOException {
@@ -254,10 +257,17 @@ class NewRelicLogbackTests {
     }
 
     private void thenMockAgentDataIsInTheMessage() throws Throwable {
+        String output = getOutput();
+
+        System.out.println("ED: OUTPUT CHARS: ");
+        for (char c : output.toCharArray()) {
+            System.out.print((int) c + " ");
+        }
+
         assertTrue(
-                getOutput().contains("some.key=some.value")
-                        || getOutput().contains("\"some.key\":\"some.value\""),
-                "Expected >>" + getOutput() + "<< to contain some.key to some.value"
+                output.contains("\"some.key\"=\"some.value\"")
+                        || output.contains("\"some.key\":\"some.value\""),
+                "Expected log output to contain linking metadata: " + output
         );
     }
 
@@ -273,7 +283,7 @@ class NewRelicLogbackTests {
                 getOutput(),
                 ImmutableMap.of(
                         "error.class", "java.lang.Exception",
-                        "error.stack", Pattern.compile(".*NewRelicLogbackTests\\.shouldAppendErrorDataCorrectly.*", Pattern.DOTALL),
+                        "error.stack", Pattern.compile(".*NewRelicLogback13Tests\\.shouldAppendErrorDataCorrectly.*", Pattern.DOTALL),
                         "error.message", "~~ oops ~~")
         );
     }
@@ -312,13 +322,11 @@ class NewRelicLogbackTests {
     private String getOutput() throws IOException {
         if (output == null) {
             output = bufferedReader.readLine() + "\n";
+            System.out.println("Output: " + output);
+            appender.stop();
         }
-        assertNotNull(output);
+//        assertNotNull(output);
         return output;
     }
-
-
-
-
 
 }

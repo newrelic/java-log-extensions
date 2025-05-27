@@ -48,11 +48,10 @@ public class NewRelicJsonLayout implements Layout<ILoggingEvent> {
         try (JsonGenerator generator = JsonFactoryProvider.getInstance().createGenerator(sw)) {
             writeToGenerator(event, generator);
         } catch (Throwable ignored) {
-            return event.getFormattedMessage();
+            return event.getFormattedMessage() + "\n";
         }
 
-        sw.append('\n');
-        return sw.toString();
+        return sw.toString() + "\n";
     }
 
     private void writeToGenerator(ILoggingEvent event, JsonGenerator generator) throws IOException {
