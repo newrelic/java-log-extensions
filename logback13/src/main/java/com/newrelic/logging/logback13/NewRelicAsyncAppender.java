@@ -48,28 +48,38 @@ public class NewRelicAsyncAppender extends AsyncAppender {
     protected void preprocess(ILoggingEvent eventObject) {
         Map<String, String> linkingMetadata = agentSupplier.get().getLinkingMetadata();
 
-        // NR linking metadata is added to the MDC map, if MDC is enabled
         if (!isNoOpMDC) {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
                 MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
+            super.preprocess(eventObject);
+            /*
+             * In logback-1.3.x, calling eventObject.getMDCPropertyMap() returns an immutable map (Collections.emptyMap()).
+             * To add New Relic linking metadata to the event, we need to set the argument array with the linking metadata.
+             * This allows us to maintain compatibility with logback-1.3.x while still supporting the New Relic linking metadata
+             * in the event object.
+             */
         }
-        super.preprocess(eventObject);
-        /*
-         * In logback-1.3.x, calling eventObject.getMDCPropertyMap() returns an immutable map (Collections.emptyMap()).
-         * To add New Relic linking metadata to the event, we first check if MDC is disabled (isNoOpMDC). Then we create
-         * a new MDC map (that is mutable) and add the linking metadata and call setMDCPropertyMap() to set the new map.
-         */
+
         if (isNoOpMDC) {
+            Object[] args = linkingMetadata.entrySet().stream()
+                    .map(event -> CustomArgument.keyValue(event.getKey(), event.getValue()))
+                    .toArray(CustomArgument[]::new);
+            ((LoggingEvent) eventObject).setArgumentArray(args);
+
+            Map<String, String> mdcMap = new HashMap<>();
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
-                eventObject.getMDCPropertyMap().put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
+                mdcMap.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
+            ((LoggingEvent) eventObject).setMDCPropertyMap(mdcMap);
         }
     }
 
     //visible for testing
     public static Supplier<Agent> agentSupplier = NewRelic::getAgent;
-    @SuppressWarnings("WeakerAccess") //visible for testing
+
+    // visible for testing
+    @SuppressWarnings("WeakerAccess")
     public static boolean isNoOpMDC = MDC.getMDCAdapter() instanceof NOPMDCAdapter;
 }
 
