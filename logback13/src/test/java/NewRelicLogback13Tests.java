@@ -176,7 +176,7 @@ class NewRelicLogback13Tests {
 
     private void givenALoggingEventWithExceptionData() {
         givenALoggingEvent();
-        event.setThrowableProxy(new ThrowableProxy(new Exception("~~ oops ~~")));
+        event.setThrowableProxy(new ThrowableProxy(new Exception("some interesting info")));
     }
 
     private void givenALoggingEventWithCallerData() {
@@ -241,10 +241,6 @@ class NewRelicLogback13Tests {
         outputStream.flush();
     }
 
-    private boolean appenderIsIdle() {
-        return ((NewRelicAsyncAppender) appender).getQueueSize() == 0;
-    }
-
     private void thenJsonLayoutWasUsed() throws IOException {
         LogAsserts.assertFieldValues(
                 getOutput(),
@@ -257,17 +253,10 @@ class NewRelicLogback13Tests {
     }
 
     private void thenMockAgentDataIsInTheMessage() throws Throwable {
-        String output = getOutput();
-
-        System.out.println("ED: OUTPUT CHARS: ");
-        for (char c : output.toCharArray()) {
-            System.out.print((int) c + " ");
-        }
-
         assertTrue(
-                output.contains("\"some.key\"=\"some.value\"")
-                        || output.contains("\"some.key\":\"some.value\""),
-                "Expected log output to contain linking metadata: " + output
+                getOutput().contains("some.key=some.value")
+                        || getOutput().contains("\"some.key\":\"some.value\""),
+                "Expected >>" + getOutput() + "<< to contain some.key to some.value"
         );
     }
 
@@ -284,7 +273,7 @@ class NewRelicLogback13Tests {
                 ImmutableMap.of(
                         "error.class", "java.lang.Exception",
                         "error.stack", Pattern.compile(".*NewRelicLogback13Tests\\.shouldAppendErrorDataCorrectly.*", Pattern.DOTALL),
-                        "error.message", "~~ oops ~~")
+                        "error.message", "some error message")
         );
     }
 
@@ -322,10 +311,9 @@ class NewRelicLogback13Tests {
     private String getOutput() throws IOException {
         if (output == null) {
             output = bufferedReader.readLine() + "\n";
-            System.out.println("Output: " + output);
             appender.stop();
         }
-//        assertNotNull(output);
+        assertNotNull(output);
         return output;
     }
 

@@ -45,6 +45,17 @@ public class NewRelicAsyncAppender extends AsyncAppender {
     }
 
     @Override
+    protected void append(ILoggingEvent eventObject) {
+        Map<String, String> linkingMetadata = agentSupplier.get().getLinkingMetadata();
+        if (!isNoOpMDC) {
+            for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
+                MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
+            }
+        }
+        super.append(eventObject);
+    }
+
+    @Override
     protected void preprocess(ILoggingEvent eventObject) {
         Map<String, String> linkingMetadata = agentSupplier.get().getLinkingMetadata();
 
@@ -52,6 +63,12 @@ public class NewRelicAsyncAppender extends AsyncAppender {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
                 MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
+
+            Map<String, String> mdcCopy = MDC.getCopyOfContextMap();
+            if (mdcCopy != null && eventObject instanceof LoggingEvent) {
+                ((LoggingEvent) eventObject).setMDCPropertyMap(mdcCopy);
+            }
+
             super.preprocess(eventObject);
             /*
              * In logback-1.3.x, calling eventObject.getMDCPropertyMap() returns an immutable map (Collections.emptyMap()).

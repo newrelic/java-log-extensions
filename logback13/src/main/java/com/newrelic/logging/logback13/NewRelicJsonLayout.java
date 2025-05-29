@@ -6,57 +6,48 @@
 package com.newrelic.logging.logback13;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.ThrowableProxyUtil;
 import ch.qos.logback.core.Context;
-import ch.qos.logback.core.Layout;
+import ch.qos.logback.core.LayoutBase;
 import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.WarnStatus;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
-import com.newrelic.logging.core.ExceptionUtil;
 import com.newrelic.logging.core.LogExtensionConfig;
+import com.fasterxml.jackson.core.JsonFactory;
 import org.slf4j.Marker;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 
 import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
-import static com.newrelic.logging.core.LogExtensionConfig.getMaxStackSize;
 import static com.newrelic.logging.logback13.NewRelicAsyncAppender.NEW_RELIC_PREFIX;
 
-public class NewRelicJsonLayout implements Layout<ILoggingEvent> {
-    private final Integer maxStackSize;
+public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     private boolean started = false;
     private Context context;
-
-    public NewRelicJsonLayout() {
-        this(getMaxStackSize());
-    }
-
-    public NewRelicJsonLayout(Integer maxStackSize) {
-        this.maxStackSize = maxStackSize;
-    }
 
     @Override
     public String doLayout(ILoggingEvent event) {
         StringWriter sw = new StringWriter();
 
-        try (JsonGenerator generator = JsonFactoryProvider.getInstance().createGenerator(sw)) {
+        try (JsonGenerator generator = new JsonFactory().createGenerator(sw);) {
             writeToGenerator(event, generator);
         } catch (Throwable ignored) {
-            return event.getFormattedMessage() + "\n";
+            return event.getFormattedMessage();
         }
 
-        return sw.toString() + "\n";
+        sw.append('\n');
+        return sw.toString();
     }
 
     private void writeToGenerator(ILoggingEvent event, JsonGenerator generator) throws IOException {
-        generator.writeStartObject();
+        System.out.println("[writeToGenerator] Executing layout event for: " + event.getFormattedMessage());
 
+        generator.writeStartObject();
         generator.writeStringField(ElementName.MESSAGE, event.getFormattedMessage());
         generator.writeNumberField(ElementName.TIMESTAMP, event.getTimeStamp());
         generator.writeStringField(ElementName.LOG_LEVEL, event.getLevel().toString());
@@ -71,41 +62,30 @@ public class NewRelicJsonLayout implements Layout<ILoggingEvent> {
         }
 
         Map<String, String> mdcPropertyMap = event.getMDCPropertyMap();
-        for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
-            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                if (entry.getKey().startsWith(NEW_RELIC_PREFIX)) {
-                    String key = entry.getKey().substring(NEW_RELIC_PREFIX.length());
-                    generator.writeStringField(key, entry.getValue());
-                } else if (LogExtensionConfig.shouldAddMDC()) {
-                    generator.writeStringField(CONTEXT_PREFIX + entry.getKey(), entry.getValue());
+        if (mdcPropertyMap != null) {
+            System.out.println("[writeToGenerator] mdcPropertyMap is not null, size: " + mdcPropertyMap.size());
+            for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
+                if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                    System.out.println("[writeToGenerator] Current entry key: " + entry.getKey());
+                    if (entry.getKey().startsWith(NEW_RELIC_PREFIX)) {
+                        String key = entry.getKey().substring(NEW_RELIC_PREFIX.length());
+                        generator.writeStringField(key, entry.getValue());
+                    } else if (LogExtensionConfig.shouldAddMDC()){
+                        generator.writeStringField(CONTEXT_PREFIX + entry.getKey(), entry.getValue());
+                    }
                 }
             }
+        } else {
+            System.out.println("[writeToGenerator] mdcPropertyMap is null");
         }
 
-        if (event.getMarkerList() != null && !event.getMarkerList().isEmpty()) {
+        List<Marker> markerList = event.getMarkerList();
+        if (markerList != null && !markerList.isEmpty()) {
             generator.writeArrayFieldStart(ElementName.MARKER);
-            for (Marker marker : event.getMarkerList()) {
+            for (Marker marker : markerList) {
                 generator.writeString(marker.getName());
             }
             generator.writeEndArray();
-
-        }
-
-        Object[] customArgumentArray = event.getArgumentArray();
-        if (customArgumentArray != null) {
-            for (Object oneCustomArgumentObject : customArgumentArray) {
-                if (oneCustomArgumentObject instanceof CustomArgument) {
-                    CustomArgument customArgument = (CustomArgument) oneCustomArgumentObject;
-                    generator.writeStringField(customArgument.getKey(), customArgument.getValue());
-                }
-            }
-        }
-
-        IThrowableProxy proxy = event.getThrowableProxy();
-        if (proxy != null) {
-            generator.writeObjectField(ElementName.ERROR_CLASS, proxy.getClassName());
-            generator.writeObjectField(ElementName.ERROR_MESSAGE, proxy.getMessage());
-            generator.writeObjectField(ElementName.ERROR_STACK, ExceptionUtil.transformLogbackStackTraceString(ThrowableProxyUtil.asString(proxy)));
         }
 
         generator.writeEndObject();
