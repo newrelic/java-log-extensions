@@ -1,5 +1,5 @@
 plugins {
-    java
+    id("java")
     id("com.github.spotbugs").version("4.4.4")
 }
 

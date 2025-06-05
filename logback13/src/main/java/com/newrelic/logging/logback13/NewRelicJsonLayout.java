@@ -16,10 +16,15 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
 import com.newrelic.logging.core.LogExtensionConfig;
 import com.fasterxml.jackson.core.JsonFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.Marker;
+import org.slf4j.helpers.NOPMDCAdapter;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,55 +36,50 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     private Context context;
 
     @Override
-    public String doLayout(ILoggingEvent event) {
+    public String doLayout(ILoggingEvent eventObject) {
         StringWriter sw = new StringWriter();
 
-        try (JsonGenerator generator = new JsonFactory().createGenerator(sw);) {
-            writeToGenerator(event, generator);
-        } catch (Throwable ignored) {
-            return event.getFormattedMessage();
+        try {
+            JsonGenerator generator = new JsonFactory().createGenerator(sw);
+            writeToGenerator(eventObject, generator);
+        } catch (IOException ignored) {
+            return eventObject.getFormattedMessage();
         }
 
         sw.append('\n');
+        System.out.println("[NewRelicJsonLayout.doLayout] sw.toString() : " + sw.toString());
         return sw.toString();
     }
 
-    private void writeToGenerator(ILoggingEvent event, JsonGenerator generator) throws IOException {
-        System.out.println("[writeToGenerator] Executing layout event for: " + event.getFormattedMessage());
+    private void writeToGenerator(ILoggingEvent eventObject, JsonGenerator generator) throws IOException {
+        boolean isNoOpMDC = MDC.getMDCAdapter() instanceof NOPMDCAdapter;
 
         generator.writeStartObject();
-        generator.writeStringField(ElementName.MESSAGE, event.getFormattedMessage());
-        generator.writeNumberField(ElementName.TIMESTAMP, event.getTimeStamp());
-        generator.writeStringField(ElementName.LOG_LEVEL, event.getLevel().toString());
-        generator.writeStringField(ElementName.LOGGER_NAME, event.getLoggerName());
-        generator.writeStringField(ElementName.THREAD_NAME, event.getThreadName());
+        generator.writeStringField(ElementName.MESSAGE, eventObject.getFormattedMessage());
+        generator.writeNumberField(ElementName.TIMESTAMP, eventObject.getTimeStamp());
+        generator.writeStringField(ElementName.LOG_LEVEL, eventObject.getLevel().toString());
+        generator.writeStringField(ElementName.LOGGER_NAME, eventObject.getLoggerName());
+        generator.writeStringField(ElementName.THREAD_NAME, eventObject.getThreadName());
 
-        if (event.hasCallerData()) {
-            StackTraceElement element = event.getCallerData()[event.getCallerData().length - 1];
+        if (eventObject.hasCallerData()) {
+            StackTraceElement element = eventObject.getCallerData()[eventObject.getCallerData().length - 1];
             generator.writeStringField(ElementName.CLASS_NAME, element.getClassName());
             generator.writeStringField(ElementName.METHOD_NAME, element.getMethodName());
             generator.writeNumberField(ElementName.LINE_NUMBER, element.getLineNumber());
         }
 
-        Map<String, String> mdcPropertyMap = event.getMDCPropertyMap();
+        Map<String, String> mdcPropertyMap = eventObject.getMDCPropertyMap();
         if (mdcPropertyMap != null) {
-            System.out.println("[writeToGenerator] mdcPropertyMap is not null, size: " + mdcPropertyMap.size());
             for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
-                if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                    System.out.println("[writeToGenerator] Current entry key: " + entry.getKey());
-                    if (entry.getKey().startsWith(NEW_RELIC_PREFIX)) {
-                        String key = entry.getKey().substring(NEW_RELIC_PREFIX.length());
-                        generator.writeStringField(key, entry.getValue());
-                    } else if (LogExtensionConfig.shouldAddMDC()){
-                        generator.writeStringField(CONTEXT_PREFIX + entry.getKey(), entry.getValue());
-                    }
-                }
+                generator.writeStringField(entry.getKey(), entry.getValue());
             }
-        } else {
-            System.out.println("[writeToGenerator] mdcPropertyMap is null");
+        } else if (!isNoOpMDC) {
+            for (Map.Entry<String, String> entry : MDC.getCopyOfContextMap().entrySet()) {
+                generator.writeStringField(entry.getKey(), entry.getValue());
+            }
         }
 
-        List<Marker> markerList = event.getMarkerList();
+        List<Marker> markerList = eventObject.getMarkerList();
         if (markerList != null && !markerList.isEmpty()) {
             generator.writeArrayFieldStart(ElementName.MARKER);
             for (Marker marker : markerList) {
@@ -87,7 +87,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             }
             generator.writeEndArray();
         }
-
         generator.writeEndObject();
     }
 
@@ -116,25 +115,21 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         return "application/json";
     }
 
-    //
     @Override
     public void setContext(Context context) {
         this.context = context;
     }
 
-    //
     @Override
     public Context getContext() {
         return context;
     }
 
-    //
     @Override
     public void addStatus(Status status) {
         context.getStatusManager().add(status);
     }
 
-    //
     @Override
     public void addInfo(String msg) {
         if (context != null) {
@@ -142,7 +137,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         }
     }
 
-    //
     @Override
     public void addInfo(String msg, Throwable ex) {
         if (context != null) {
@@ -150,7 +144,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         }
     }
 
-    //
     @Override
     public void addWarn(String msg) {
         if (context != null) {
@@ -158,7 +151,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         }
     }
 
-    //
     @Override
     public void addWarn(String msg, Throwable ex) {
         if (context != null) {
@@ -166,7 +158,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         }
     }
 
-    //
     @Override
     public void addError(String msg) {
         if (context != null) {
@@ -174,7 +165,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         }
     }
 
-    //
     @Override
     public void addError(String msg, Throwable ex) {
         if (context != null) {
