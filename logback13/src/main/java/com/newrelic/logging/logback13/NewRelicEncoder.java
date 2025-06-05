@@ -9,6 +9,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.encoder.Encoder;
 import ch.qos.logback.core.encoder.EncoderBase;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -28,10 +30,22 @@ import java.nio.charset.StandardCharsets;
  */
 public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     private final NewRelicJsonLayout layout = new NewRelicJsonLayout();
+//    private OutputStream outputStream;
+
+//    public void setOutputStream(OutputStream os) {
+//        this.outputStream = os;
+//    }
 
     @Override
     public byte[] encode(ILoggingEvent event) {
         String laidOutResult = layout.doLayout(event);
+        byte[] resultArray = laidOutResult.getBytes(StandardCharsets.UTF_8);
+//        try {
+//            outputStream.write(resultArray);
+//            outputStream.flush();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
         return laidOutResult.getBytes(StandardCharsets.UTF_8);
     }
 

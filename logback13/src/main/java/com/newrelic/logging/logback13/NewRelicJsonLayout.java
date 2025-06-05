@@ -47,7 +47,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         }
 
         sw.append('\n');
-        System.out.println("[NewRelicJsonLayout.doLayout] sw.toString() : " + sw.toString());
         return sw.toString();
     }
 
@@ -75,7 +74,16 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             }
         } else if (!isNoOpMDC) {
             for (Map.Entry<String, String> entry : MDC.getCopyOfContextMap().entrySet()) {
-                generator.writeStringField(entry.getKey(), entry.getValue());
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (value == null || value.isEmpty()) {
+                    continue;
+                }
+                if (key.startsWith(NEW_RELIC_PREFIX)) {
+                    generator.writeStringField(key.substring(NEW_RELIC_PREFIX.length()), value);
+                } else {
+                    generator.writeStringField(CONTEXT_PREFIX + key, value);
+                }
             }
         }
 
