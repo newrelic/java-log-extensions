@@ -1,5 +1,3 @@
-package com.newrelic.logging.logback13;
-
 import com.fasterxml.jackson.core.JsonFactory;
 
 public class JsonFactoryProvider {

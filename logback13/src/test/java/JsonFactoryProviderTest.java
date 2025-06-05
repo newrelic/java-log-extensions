@@ -1,5 +1,4 @@
 import com.fasterxml.jackson.core.JsonFactory;
-import com.newrelic.logging.logback13.JsonFactoryProvider;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

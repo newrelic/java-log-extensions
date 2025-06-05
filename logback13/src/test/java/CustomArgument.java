@@ -1,5 +1,3 @@
-package com.newrelic.logging.logback13;
-
 public class CustomArgument {
     private final String key;
     private final String value;
