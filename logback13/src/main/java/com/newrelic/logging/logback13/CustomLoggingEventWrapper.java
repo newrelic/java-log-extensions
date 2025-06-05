@@ -15,6 +15,14 @@ import org.slf4j.event.KeyValuePair;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This wrapper ensures compatibility with Logback 1.3.x, which introduced changes to the ILoggingEvent. ILoggingEvent.getMDCPropertyMap() now returns
+ * an immutable MDC map and ILoggingEvent.setMDCPropertyMap() is no longer available.
+ * <p>
+ * This class implements the {@link ILoggingEvent} interface and wraps an existing ILoggingEvent,
+ * allowing for custom MDC (Mapped Diagnostic Context) properties to be set.
+ */
+
 public class CustomLoggingEventWrapper implements ILoggingEvent {
     private final ILoggingEvent delegate;
     private final Map<String, String> customMdc;
