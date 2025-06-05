@@ -1,3 +1,8 @@
+/*
+ * Copyright 2025. New Relic Corporation. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package com.newrelic.logging.logback13;
 
 import ch.qos.logback.classic.Level;
@@ -21,6 +26,11 @@ public class CustomLoggingEventWrapper implements ILoggingEvent {
 
     @Override
     public Map<String, String> getMDCPropertyMap() {
+        return customMdc;
+    }
+
+    @Override
+    public Map<String, String> getMdc() {
         return customMdc;
     }
 
@@ -77,11 +87,6 @@ public class CustomLoggingEventWrapper implements ILoggingEvent {
     @Override
     public List<Marker> getMarkerList() {
         return delegate.getMarkerList();
-    }
-
-    @Override
-    public Map<String, String> getMdc() {
-        return delegate.getMdc();
     }
 
     @Override
