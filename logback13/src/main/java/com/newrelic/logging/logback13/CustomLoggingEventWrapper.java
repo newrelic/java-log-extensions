@@ -27,9 +27,9 @@ public class CustomLoggingEventWrapper implements ILoggingEvent {
     private final ILoggingEvent delegate;
     private final Map<String, String> customMdc;
 
-    public CustomLoggingEventWrapper(ILoggingEvent delegate, Map<String, String> mdcOverride) {
+    public CustomLoggingEventWrapper(ILoggingEvent delegate, Map<String, String> customContext) {
         this.delegate = delegate;
-        this.customMdc = mdcOverride;
+        this.customMdc = customContext;
     }
 
     @Override
