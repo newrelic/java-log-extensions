@@ -20,18 +20,18 @@ import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
 /**
  * An {@link AsyncAppender} implementation that synchronously captures New Relic trace data.
  * <p>
- * This appender will wrap the existing {@link AsyncAppender} logic in order to capture New Relic data
- * on the same thread as the log message was created. To use, wrap your existing appender in your
- * config xml, and use the async appender in the appropriate logger.
+ * This appender will wrap the existing {@link AsyncAppender} logic in order to capture New Relic data on
+ * the same thread as the log message was created. To use, wrap your existing appender in your config xml,
+ * and use the async appender in the appropriate logger.
  *
  * <pre>{@code
- *     <appender name="ASYNC" class="com.newrelic.logging.logback1.NewRelicAsyncAppender">
- *         <appender-ref ref="LOG_FILE" />
- *     </appender>
+ *      <appender name="ASYNC" class="com.newrelic.logging.logback13.NewRelicAsyncAppender">
+ *          <appender-ref ref="LOG_FILE" />
+ *      </appender>
  *
- *     <root level="INFO">
- *         <appender-ref ref="ASYNC" />
- *     <root>
+ *      <root level="INFO">
+ *          <appender-ref ref="ASYNC" />
+ *      <root>
  * }</pre>
  *
  * @see <a href="https://logback.qos.ch/manual/appenders.html#AsyncAppender">Logback AsyncAppender</a>
@@ -46,7 +46,6 @@ public class NewRelicAsyncAppender extends AsyncAppender {
 
     @Override
     protected void append(ILoggingEvent eventObject) {
-        ILoggingEvent wrappedEvent;
         if (!isStarted()) {
             return;
         }
@@ -71,11 +70,11 @@ public class NewRelicAsyncAppender extends AsyncAppender {
             for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
                 MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
             }
-            wrappedEvent = eventObject;
+            super.append(eventObject);
         } else {
-            wrappedEvent = new CustomLoggingEventWrapper(eventObject, combinedContextMap);
+            ILoggingEvent wrappedEvent = new CustomLoggingEventWrapper(eventObject, combinedContextMap);
+            super.append(wrappedEvent);
         }
-        super.append(wrappedEvent);
     }
 
     //visible for testing
