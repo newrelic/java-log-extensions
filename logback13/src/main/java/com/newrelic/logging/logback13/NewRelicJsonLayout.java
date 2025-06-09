@@ -31,6 +31,11 @@ import java.util.Map;
 import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
 import static com.newrelic.logging.logback13.NewRelicAsyncAppender.NEW_RELIC_PREFIX;
 
+/**
+ * A layout that formats log events as JSON objects, suitable for use with New Relic.
+ * Adds standard fields such and injects linking metadata using prefixed MDC keys.
+ */
+
 public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
     private boolean started = false;
     private Context context;
@@ -46,7 +51,6 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             return eventObject.getFormattedMessage();
         }
 
-        sw.append('\n');
         return sw.toString();
     }
 
