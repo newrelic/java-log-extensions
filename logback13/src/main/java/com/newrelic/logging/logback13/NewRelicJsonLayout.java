@@ -73,7 +73,21 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
 
         Map<String, String> mdcPropertyMap = eventObject.getMDCPropertyMap();
         if (mdcPropertyMap != null) {
+            String key;
+            String value;
+
             for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
+                if (entry.getKey() == null) {
+                    continue;
+                } else {
+                    key = entry.getKey();
+                    value = entry.getValue();
+                    if (key.startsWith(NEW_RELIC_PREFIX)) {
+                        generator.writeStringField(key.substring(NEW_RELIC_PREFIX.length()), value);
+                    } else if (!isNoOpMDC) {
+                        generator.writeStringField(CONTEXT_PREFIX + key, value);
+                    }
+                }
                 generator.writeStringField(entry.getKey(), entry.getValue());
             }
         } else if (!isNoOpMDC) {
