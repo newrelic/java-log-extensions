@@ -1,70 +1,249 @@
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.read.ListAppender;
-import com.newrelic.api.agent.Agent;
+import ch.qos.logback.core.OutputStreamAppender;
 import com.newrelic.logging.logback13.NewRelicAsyncAppender;
 import com.newrelic.logging.logback13.NewRelicEncoder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
-import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NewRelicLogback13Tests {
 
-    private static final LoggerContext loggerContext = new LoggerContext();
-    private static final String TEST_MESSAGE = "This is an amazing test message.";
+    private static Logger logger;
+    private LoggerContext loggerContext;
+    private ByteArrayOutputStream outputStream;
 
-    private NewRelicAsyncAppender appender;
-    private ListAppender<ILoggingEvent> listAppender;
+    NewRelicAsyncAppender appender;
+    OutputStreamAppender<ILoggingEvent> delegateAppender;
+
+    private static final String CONTEXT_PREFIX = "context.";
 
     @BeforeEach
     void setup() {
-        Agent mockAgent = Mockito.mock(Agent.class);
-        Mockito.when(mockAgent.getLinkingMetadata()).thenReturn(Map.of("traceId", "abd123", "spanId", "xyz789"));
-        NewRelicAsyncAppender.agentSupplier = () -> mockAgent;
+        loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        loggerContext.reset();
+
+        logger = loggerContext.getLogger("TestLogger");
+        logger.setLevel(Level.DEBUG);
+
+        outputStream = new ByteArrayOutputStream();
 
         NewRelicEncoder encoder = new NewRelicEncoder();
+        encoder.setContext(loggerContext);
         encoder.start();
 
-        ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
-        consoleAppender.setContext(loggerContext);
-        consoleAppender.setEncoder(encoder);
-        consoleAppender.start();
+        delegateAppender = new OutputStreamAppender<>();
+        delegateAppender.setContext(loggerContext);
+        delegateAppender.setName("NR_TEST_DELEGATE_APPENDER");
+        delegateAppender.setOutputStream(outputStream);
+        delegateAppender.setEncoder(encoder);
+        delegateAppender.setImmediateFlush(true);
+        delegateAppender.start();
 
         appender = new NewRelicAsyncAppender();
         appender.setContext(loggerContext);
-        appender.addAppender(consoleAppender);
+        appender.setName("NR_TEST_APPENDER");
+        appender.addAppender(delegateAppender);
         appender.start();
+
+        logger.addAppender(appender);
     }
 
     @AfterEach
-    void tearDown() {
+    void teardown() {
         MDC.clear();
-        appender.stop();
-        appender.detachAndStopAllAppenders();
     }
 
     @Test
-    void testBasicLogMessageIncludesLinkingMetadata() {
-//        LoggingEvent event = createBasicEvent(TEST_MESSAGE);
-//        appender.doAppend(event);
+    void shouldWrapJsonConsoleAppenderCorrectly() throws InterruptedException, IOException {
+        logger.info("Very interesting test message");
+        Thread.sleep(100);
+        String output = getLogOutput();
 
-//        AssertTrue(event.getMDCPropertyMap().containsKey("NewRelic:"));
-
-
-
-        ILoggingEvent event = Mockito.mock(ILoggingEvent.class);
-        Mockito.when(event.getMessage()).thenReturn(TEST_MESSAGE);
-        Mockito.when(event.getMDCPropertyMap()).thenReturn(Map.of("customKey", "customValue"));
-
-        appender.doAppend(event);
-
-        // Verify that the message was logged with the expected metadata
-//        assert appender.getAppender("console").getEncoder().encode(event).contains("traceId\":\"abd123");
-//        assert appender.getAppender("console").getEncoder().encode(event).contains("spanId\":\"xyz789");
+        assertTrue(logger.isInfoEnabled());
+        assertTrue(output.contains("\"message\":\"Very interesting test message\""));
     }
+
+    @Test
+    void shouldAllWorkCorrectlyWithoutMDC() throws InterruptedException {
+        logger.info("Very interesting test message, no MDC");
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("Very interesting test message, no MDC"));
+        assertFalse(output.contains(CONTEXT_PREFIX));
+    }
+
+    @Test
+    void shouldAppendCallerDataToJsonCorrectly() throws InterruptedException {
+        appender.setIncludeCallerData(true);
+        logger.info("Test message with Caller Data");
+
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("class.name"));
+        assertTrue(output.contains("method.name"));
+        assertTrue(output.contains("line.number"));
+        assertTrue(output.contains("Test message with Caller Data"));
+    }
+
+    @Test
+    void shouldAppendMDCArgsToJsonWhenEnabled() throws InterruptedException {
+        MDC.put("userId", "user-123");
+        MDC.put("sessionId", "session-456");
+
+        logger.info("Logging with MDC enabled");
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("\"context.userId\":\"user-123\""));
+        assertTrue(output.contains("\"context.sessionId\":\"session-456\""));
+        assertTrue(output.contains("Logging with MDC enabled"));
+    }
+
+    @Test
+    void shouldNotAppendMDCArgsToJsonWhenMDCIsDisabled() throws InterruptedException {
+        NewRelicAsyncAppender.isNoOpMDC = true;
+        MDC.put("userId", "user-123");
+        MDC.clear();
+
+        logger.info("Logging with MDC disabled");
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("Logging with MDC disabled"));
+        assertFalse(output.contains("\"context.userId\":\"user-123\""));
+        assertFalse(output.contains("NewRelic:"));
+    }
+
+    @Test
+    void shouldSerializeExceptionStackTraceCorrectly() throws InterruptedException {
+        Exception exception = new IllegalArgumentException("Test exception");
+
+        logger.error("Logging a test exception", exception);
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("Logging a test exception"));
+        assertTrue(output.contains("java.lang.IllegalArgumentException"));
+        assertTrue(output.contains("Test exception"));
+        assertTrue(output.contains("at "));
+    }
+
+    @Test
+    void shouldIncludeNewRelicLinkingMetadata() throws InterruptedException {
+        MDC.put("traceId", "abc123");
+        MDC.put("spanId", "xyz789");
+        MDC.put("entityId", "entity-456");
+
+        logger.info("Log with New Relic linking metadata");
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("\"traceId\":\"abc123\""));
+        assertTrue(output.contains("\"spanId\":\"xyz789\""));
+        assertTrue(output.contains("\"entityId\":\"entity-456\""));
+        assertTrue(output.contains("Log with New Relic linking metadata"));
+    }
+
+    @Test
+    void shouldIncludeMarkersInJsonOutput() throws InterruptedException {
+        Marker marker = MarkerFactory.getMarker("TEST_MARKER");
+        logger.info(marker, "Log message with marker");
+
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("\"marker\":[\"TEST_MARKER\"]"));
+        assertTrue(output.contains("Log message with marker"));
+    }
+
+    @Test
+    void shouldLogToMultipleAppendersCorrectly() throws InterruptedException {
+        ByteArrayOutputStream stream1 = new ByteArrayOutputStream();
+        OutputStreamAppender<ILoggingEvent> appender1 = new OutputStreamAppender<>();
+        appender1.setContext(loggerContext);
+        appender1.setName("NR_TEST_APPENDER_1");
+        appender1.setOutputStream(stream1);
+        appender1.setEncoder(new NewRelicEncoder());
+        appender1.start();
+
+        ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+        OutputStreamAppender<ILoggingEvent> appender2 = new OutputStreamAppender<>();
+        appender2.setContext(loggerContext);
+        appender2.setName("NR_TEST_APPENDER_2");
+        appender2.setOutputStream(stream2);
+        appender2.setEncoder(new NewRelicEncoder());
+        appender2.start();
+
+        logger.addAppender(appender1);
+        logger.addAppender(appender2);
+        logger.info("Test message for multiple appenders");
+        Thread.sleep(100);
+
+        String output1 = stream1.toString();
+        String output2 = stream2.toString();
+
+        assertTrue(output1.contains("\"message\":\"Test message for multiple appenders\""));
+        assertTrue(output2.contains("\"message\":\"Test message for multiple appenders\""));
+
+        assertNotEquals("", output1);
+        assertNotEquals("", output2);
+    }
+
+    @Test
+    void shouldHandleNullOrEmptyMessagesGracefully() throws InterruptedException {
+        logger.info(null);
+        Thread.sleep(100);
+        String output = getLogOutput();
+        assertTrue(output.contains("\"message\":null"));
+        assertTrue(output.contains("\"log.level\":\"INFO\""));
+
+        logger.info("");
+        Thread.sleep(100);
+        output = getLogOutput();
+        assertTrue(output.contains("\"message\":\"\""));
+        assertTrue(output.contains("\"log.level\":\"INFO\""));
+    }
+
+    @Test
+    void shouldLogDifferentLevelsCorrectly() throws InterruptedException {
+        logger.debug("Debug message");
+        logger.info("Info message");
+        logger.warn("Warn message");
+        logger.error("Error message");
+
+        Thread.sleep(100);
+        String output = getLogOutput();
+
+        assertTrue(output.contains("\"message\":\"Info message\""));
+        assertTrue(output.contains("\"message\":\"Warn message\""));
+        assertTrue(output.contains("\"message\":\"Error message\""));
+        assertTrue(output.contains("\"message\":\"Debug message\""));
+
+        assertTrue(output.contains("\"log.level\":\"DEBUG\""));
+        assertTrue(output.contains("\"log.level\":\"INFO\""));
+        assertTrue(output.contains("\"log.level\":\"WARN\""));
+        assertTrue(output.contains("\"log.level\":\"ERROR\""));
+    }
+
+    private String getLogOutput() {
+        return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+    }
+
 }
