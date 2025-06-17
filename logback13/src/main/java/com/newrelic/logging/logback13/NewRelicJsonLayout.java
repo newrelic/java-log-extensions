@@ -6,6 +6,8 @@
 package com.newrelic.logging.logback13;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.LayoutBase;
 import ch.qos.logback.core.status.ErrorStatus;
@@ -14,17 +16,13 @@ import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.WarnStatus;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
-import com.newrelic.logging.core.LogExtensionConfig;
 import com.fasterxml.jackson.core.JsonFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.helpers.NOPMDCAdapter;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,10 +45,10 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         try {
             JsonGenerator generator = new JsonFactory().createGenerator(sw);
             writeToGenerator(eventObject, generator);
+            generator.close();
         } catch (IOException ignored) {
             return eventObject.getFormattedMessage();
         }
-
         return sw.toString();
     }
 
@@ -90,7 +88,9 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
                 }
                 generator.writeStringField(entry.getKey(), entry.getValue());
             }
-        } else if (!isNoOpMDC) {
+        }
+
+        if (mdcPropertyMap == null && !isNoOpMDC) {
             for (Map.Entry<String, String> entry : MDC.getCopyOfContextMap().entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
@@ -112,6 +112,22 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
                 generator.writeString(marker.getName());
             }
             generator.writeEndArray();
+        }
+
+        IThrowableProxy throwableProxy = eventObject.getThrowableProxy();
+        if (throwableProxy != null) {
+            generator.writeFieldName("exception");
+            generator.writeStartObject();
+            generator.writeStringField("type", throwableProxy.getClassName());
+            generator.writeStringField("message", throwableProxy.getMessage());
+
+            generator.writeArrayFieldStart("stackTrace");
+            for (StackTraceElementProxy element : throwableProxy.getStackTraceElementProxyArray()) {
+                generator.writeString(element.toString());
+            }
+            generator.writeEndArray();
+
+            generator.writeEndObject();
         }
         generator.writeEndObject();
     }
