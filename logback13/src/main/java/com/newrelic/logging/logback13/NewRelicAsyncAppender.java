@@ -42,6 +42,9 @@ public class NewRelicAsyncAppender extends AsyncAppender {
     @Override
     protected void preprocess(ILoggingEvent eventObject) {
         eventObject.prepareForDeferredProcessing();
+        if (isIncludeCallerData()) {
+            eventObject.getCallerData();
+        }
     }
 
     @Override
