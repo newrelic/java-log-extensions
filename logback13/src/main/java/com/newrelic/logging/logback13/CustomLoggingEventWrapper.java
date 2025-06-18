@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This wrapper ensures compatibility with Logback 1.3.x, which introduced changes to the ILoggingEvent. ILoggingEvent.getMDCPropertyMap() now returns
- * an immutable MDC map and ILoggingEvent.setMDCPropertyMap() is no longer available.
+ * This wrapper ensures compatibility with Logback 1.3.x, which introduced changes to the {@link ILoggingEvent}.
+ * {@link ILoggingEvent#getMDCPropertyMap()} now returns an immutable MDC map and {@code ILoggingEvent#setMDCPropertyMap()} is no longer available.
  * <p>
- * This class implements the {@link ILoggingEvent} interface and wraps an existing ILoggingEvent,
- * allowing for custom MDC (Mapped Diagnostic Context) properties to be set.
+ * This class implements the {@link ILoggingEvent} interface and wraps an existing {@code ILoggingEvent},
+ * allowing for custom MDC (Mapped Diagnostic Context) map to be injected and returned when queried.
  */
 
 public class CustomLoggingEventWrapper implements ILoggingEvent {
