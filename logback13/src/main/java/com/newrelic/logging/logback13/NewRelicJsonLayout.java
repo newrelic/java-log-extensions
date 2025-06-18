@@ -26,12 +26,11 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
-import static com.newrelic.logging.logback13.NewRelicAsyncAppender.NEW_RELIC_PREFIX;
-
 /**
- * A layout that formats log events as JSON objects, suitable for use with New Relic.
- * Adds standard fields such and injects linking metadata using prefixed MDC keys.
+ * A custom layout that formats {@link ILoggingEvent} log events as JSON objects.
+ * Adds standard log fields and enriches logs with linking metadata.
+ *
+ * This layout also adds MDC (Mapped Diagnostic Context) values using prefixed keys (e.g., "context.someKey:someValue").
  */
 
 public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
@@ -49,11 +48,11 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
         } catch (IOException ignored) {
             return eventObject.getFormattedMessage();
         }
+        sw.append("\n");
         return sw.toString();
     }
 
     private void writeToGenerator(ILoggingEvent eventObject, JsonGenerator generator) throws IOException {
-        boolean isNoOpMDC = MDC.getMDCAdapter() instanceof NOPMDCAdapter;
 
         generator.writeStartObject();
         generator.writeStringField(ElementName.MESSAGE, eventObject.getFormattedMessage());
@@ -75,33 +74,12 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             String value;
 
             for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
-                if (entry.getKey() == null) {
-                    continue;
-                } else {
-                    key = entry.getKey();
-                    value = entry.getValue();
-                    if (key.startsWith(NEW_RELIC_PREFIX)) {
-                        generator.writeStringField(key.substring(NEW_RELIC_PREFIX.length()), value);
-                    } else if (!isNoOpMDC) {
-                        generator.writeStringField(CONTEXT_PREFIX + key, value);
-                    }
-                }
-                generator.writeStringField(entry.getKey(), entry.getValue());
-            }
-        }
-
-        if (mdcPropertyMap == null && !isNoOpMDC) {
-            for (Map.Entry<String, String> entry : MDC.getCopyOfContextMap().entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (value == null || value.isEmpty()) {
+                if (entry.getKey() == null || entry.getValue() == null) {
                     continue;
                 }
-                if (key.startsWith(NEW_RELIC_PREFIX)) {
-                    generator.writeStringField(key.substring(NEW_RELIC_PREFIX.length()), value);
-                } else {
-                    generator.writeStringField(CONTEXT_PREFIX + key, value);
-                }
+                key = entry.getKey();
+                value = entry.getValue();
+                generator.writeStringField(key, value);
             }
         }
 
