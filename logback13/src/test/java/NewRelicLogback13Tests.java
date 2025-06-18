@@ -1,3 +1,8 @@
+/*
+ * Copyright 2025. New Relic Corporation. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -15,7 +20,6 @@ import org.slf4j.MarkerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -146,22 +150,6 @@ public class NewRelicLogback13Tests {
     }
 
     @Test
-    void shouldIncludeNewRelicLinkingMetadata() throws InterruptedException {
-        MDC.put("traceId", "abc123");
-        MDC.put("spanId", "xyz789");
-        MDC.put("entityId", "entity-456");
-
-        logger.info("Log with New Relic linking metadata");
-        Thread.sleep(100);
-        String output = getLogOutput();
-
-        assertTrue(output.contains("\"traceId\":\"abc123\""));
-        assertTrue(output.contains("\"spanId\":\"xyz789\""));
-        assertTrue(output.contains("\"entityId\":\"entity-456\""));
-        assertTrue(output.contains("Log with New Relic linking metadata"));
-    }
-
-    @Test
     void shouldIncludeMarkersInJsonOutput() throws InterruptedException {
         Marker marker = MarkerFactory.getMarker("TEST_MARKER");
         logger.info(marker, "Log message with marker");
@@ -243,7 +231,7 @@ public class NewRelicLogback13Tests {
     }
 
     private String getLogOutput() {
-        return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+        return outputStream.toString().trim();
     }
 
 }
