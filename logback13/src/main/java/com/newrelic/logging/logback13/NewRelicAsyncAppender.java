@@ -20,9 +20,13 @@ import static com.newrelic.logging.core.LogExtensionConfig.CONTEXT_PREFIX;
 /**
  * An {@link AsyncAppender} implementation that synchronously captures New Relic trace data.
  * <p>
- * This appender will wrap the existing {@link AsyncAppender} logic in order to capture New Relic data on
- * the same thread as the log message was created. To use, wrap your existing appender in your config xml,
- * and use the async appender in the appropriate logger.
+ * This appender will wrap the existing {@link AsyncAppender} logic in order to capture New Relic linking
+ * metadata on the same thread as the log message was created.
+ * </p>
+ *
+ * <p>
+ * To use, configure this appender in the 'logback.xml' by wrapping the existing appender:
+ * </p>
  *
  * <pre>{@code
  *      <appender name="ASYNC" class="com.newrelic.logging.logback13.NewRelicAsyncAppender">
@@ -68,16 +72,8 @@ public class NewRelicAsyncAppender extends AsyncAppender {
         for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
             combinedContextMap.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
         }
-
-        if (!isNoOpMDC) {
-            for (Map.Entry<String, String> entry : linkingMetadata.entrySet()) {
-                MDC.put(NEW_RELIC_PREFIX + entry.getKey(), entry.getValue());
-            }
-            super.append(eventObject);
-        } else {
-            ILoggingEvent wrappedEvent = new CustomLoggingEventWrapper(eventObject, combinedContextMap);
-            super.append(wrappedEvent);
-        }
+        ILoggingEvent wrappedEvent = new CustomLoggingEventWrapper(eventObject, combinedContextMap);
+        super.append(wrappedEvent);
     }
 
     //visible for testing
