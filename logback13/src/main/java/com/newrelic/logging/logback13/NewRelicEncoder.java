@@ -12,9 +12,11 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * An {@link EncoderBase} implementation that serializes {@link ILoggingEvent} instances into JSON format.
+ *
  * <p>
- * This encoder is designed to work with logback 1.3.x and uses the {@link NewRelicJsonLayout} to format the log events.
- * <p>
+ * This encoder is designed to work with logback 1.3.x and uses the {@link NewRelicJsonLayout} to format log events.
+ * </p>
+ *
  * Example usage in a logback configuration file:
  * <encoder class="com.newrelic.logging.logback13.NewRelicEncoder"/>
  */
