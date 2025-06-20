@@ -17,10 +17,55 @@
 
     <Match>
         <!--
+        We have to implement all methods of the LayoutBase<ILoggingEvent>.
+        -->
+        <Bug pattern="EI_EXPOSE_REP2" />
+        <Class name="com.newrelic.logging.logback13.NewRelicJsonLayout"/>
+<!--        <Method name="setContext" />-->
+    </Match>
+
+    <Match>
+        <!--
+        We have to implement all methods of the LayoutBase<ILoggingEvent>.
+        -->
+        <Bug pattern="EI_EXPOSE_REP" />
+        <Class name="com.newrelic.logging.logback13.NewRelicJsonLayout"/>
+        <Method name="getContext" />
+    </Match>
+
+    <Match>
+        <!--
+        This method calls getCallerData() and is required to populate the stack trace in the log event,
+        even if the return value is ignored.
+        -->
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+        <Class name="com.newrelic.logging.logback13.NewRelicAsyncAppender"/>
+        <Method name="preprocess" />
+    </Match>
+
+    <Match>
+        <!--
+        This method calls getCallerData() and is required to populate the stack trace in the log event,
+        even if the return value is ignored.
+        -->
+        <Bug pattern="EI_EXPOSE_REP2" />
+        <Class name="com.newrelic.logging.logback13.CustomLoggingEventWrapper"/>
+    </Match>
+
+    <Match>
+        <!--
+        Using ByteArrayOutputStream is being used to write the JSON output, and run test assertions.
+        -->
+        <bug pattern="DM_DFAULT_ENCODING" />
+        <Class name="com.newrelic.logging.logback13.NewRelicLogback13Tests"/>
+    </Match>
+
+    <Match>
+        <!--
           We have to write to a static because otherwise this value is set based on a classload.
         -->
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-        <Class name="com.newrelic.logging.logback11.NewRelicLogback11Tests"/>
+        <Class name="com.newrelic.logging.logback13.NewRelicLogback11Tests"/>
     </Match>
 
 </FindBugsFilter>
