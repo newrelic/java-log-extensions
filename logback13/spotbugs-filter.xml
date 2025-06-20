@@ -21,7 +21,6 @@
         -->
         <Bug pattern="EI_EXPOSE_REP2" />
         <Class name="com.newrelic.logging.logback13.NewRelicJsonLayout"/>
-<!--        <Method name="setContext" />-->
     </Match>
 
     <Match>
