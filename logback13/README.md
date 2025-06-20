@@ -56,3 +56,20 @@ in the previous step.
        <appender-ref ref="ASYNC" />
    </root>
 ```
+### 5. Example `logback.xml`
+```xml
+<configuration>
+    <appender name="LOG_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/app-log-file.log</file>
+        <encoder class="com.newrelic.logging.logback13.NewRelicEncoder"/>
+    </appender>
+
+    <appender name="ASYNC" class="com.newrelic.logging.logback13.NewRelicAsyncAppender">
+        <appender-ref ref="LOG_FILE" />
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ASYNC" />
+    </root>
+</configuration>
+```
