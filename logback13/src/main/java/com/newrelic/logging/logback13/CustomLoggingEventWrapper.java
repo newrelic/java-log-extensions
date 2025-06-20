@@ -12,6 +12,7 @@ import ch.qos.logback.classic.spi.LoggerContextVO;
 import org.slf4j.Marker;
 import org.slf4j.event.KeyValuePair;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +35,12 @@ public class CustomLoggingEventWrapper implements ILoggingEvent {
 
     @Override
     public Map<String, String> getMDCPropertyMap() {
-        return customMdc;
+        return new HashMap<>(customMdc); // Returns a mutable copy of the custom MDC map
     }
 
     @Override
     public Map<String, String> getMdc() {
-        return customMdc;
+        return new HashMap<>(customMdc); // Returns a mutable copy of the custom MDC map
     }
 
     @Override
