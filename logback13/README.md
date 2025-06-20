@@ -13,13 +13,9 @@ Logback Extension for Logback-1.3. All steps are required.
 
 **Optional**: [Configuration Options](../README.md#configuration-options) for collecting MDC or controlling stack trace behavior.
 
----
-
 ### 1. Include the dependency in your project.
 
 Refer to [Maven Central](https://search.maven.org/search?q=g:com.newrelic.logging%20a:logback13) for the appropriate snippets.
-
----
 
 ### 2. Configure an `<appender>` element with a `NewRelicEncoder`.
 
