@@ -74,6 +74,9 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             String value;
 
             for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
+                if (entry.getValue() == null) {
+                    continue;
+                }
                 key = entry.getKey();
                 value = entry.getValue();
                 generator.writeStringField(key, value);

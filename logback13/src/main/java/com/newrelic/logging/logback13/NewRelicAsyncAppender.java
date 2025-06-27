@@ -62,7 +62,9 @@ public class NewRelicAsyncAppender extends AsyncAppender {
         Map<String, String> copyMdc = MDC.getMDCAdapter().getCopyOfContextMap();
         if (copyMdc != null) {
             for (Map.Entry<String, String> entry : copyMdc.entrySet()) {
-                combinedContextMap.put(CONTEXT_PREFIX + entry.getKey(), entry.getValue());
+                if (entry.getValue() != null) {
+                    combinedContextMap.put(CONTEXT_PREFIX + entry.getKey(), entry.getValue());
+                }
             }
         }
 
