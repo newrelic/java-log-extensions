@@ -17,8 +17,10 @@ import java.nio.charset.StandardCharsets;
  * This encoder is designed to work with logback 1.3.x and uses the {@link NewRelicJsonLayout} to format log events.
  * </p>
  *
+ * <pre>{@code
  * Example usage in a logback configuration file:
  * <encoder class="com.newrelic.logging.logback13.NewRelicEncoder"/>
+ * }</pre>
  */
 public class NewRelicEncoder extends EncoderBase<ILoggingEvent> {
     private final NewRelicJsonLayout layout = new NewRelicJsonLayout();
