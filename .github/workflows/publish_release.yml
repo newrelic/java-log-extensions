@@ -30,7 +30,7 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
         run: |
           SONATYPE_TOKEN=$(printf "$SONATYPE_USERNAME:$SONATYPE_PASSWORD" | base64)
-          PUBLISH_NAMESPACE="com.newrelic"
+          PUBLISH_NAMESPACE="com.newrelic.logging"
           echo "Uploading artifacts from OSSRH-Staging to Central Sonatype..."
           RESPONSE=$(curl -s -w "%{http_code}" -o response_body.txt -X POST \
             -H "Authorization: Bearer $SONATYPE_TOKEN" \
