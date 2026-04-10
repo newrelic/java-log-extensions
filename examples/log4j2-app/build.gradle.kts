@@ -21,13 +21,13 @@ dependencies {
 }
 
 
-configure<JavaPluginConvention> {
+java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 application {
-    mainClassName = "com.newrelic.testapps.log4j2.Main"
+    mainClass.set("com.newrelic.testapps.log4j2.Main")
     applicationDefaultJvmArgs += listOf(
             "-javaagent:${rootProject.projectDir}/lib/newrelic.jar",
             "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"

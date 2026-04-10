@@ -21,11 +21,12 @@ includeInJar.exclude(group = "org.apache.commons")
 configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
-    implementation("io.dropwizard:dropwizard-logging:1.3.14")
-    implementation("io.dropwizard:dropwizard-request-logging:1.3.14")
+    implementation("io.dropwizard:dropwizard-logging:3.0.0")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.5")
+    implementation("io.dropwizard:dropwizard-request-logging:3.0.0")
     implementation("javax.servlet:javax.servlet-api:3.1.0")
 
-    implementation("com.newrelic.agent.java:newrelic-api:7.6.0")
+    implementation("com.newrelic.agent.java:newrelic-api:9.1.0")
     includeInJar(project(":logback")) {
         isTransitive = false
     }
@@ -52,9 +53,17 @@ tasks.withType<Javadoc> {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(11)
+}
+
 
 tasks.register<Jar>("sourcesJar") {
     from(sourceSets.main.get().allJava)

@@ -8,7 +8,7 @@ repositories {
 subprojects {
     tasks.withType<Test>().all {
         useJUnitPlatform()
-        reports.junitXml.isEnabled = true
+        reports.junitXml.required = true
     }
 
     tasks.withType<Javadoc>().all {
