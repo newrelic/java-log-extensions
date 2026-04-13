@@ -1,13 +1,13 @@
 # The New Relic Dropwizard Logging Extension
 
-This is a lift of the existing Dropwizard Logging Extension module. It adds support for Dropwizard logging >= v3.x. 
+This is a lift of the existing Dropwizard Logging Extension module. It adds support for Dropwizard logging v3.x. 
 
 The primary difference in this module is that it requires Java 11+ (a transitive requirement of Dropwizard v3.x).
 
 ## Preconditions
 
-1. Dropwizard v3.x or higher must be configured and working in the application with the Dropwizard appenders and logging factory.
-2. You must be using Java 11 or higher (required to run Dropwizard 3+).
+1. Dropwizard v3.x must be configured and working in the application with the Dropwizard appenders and logging factory.
+2. You must be using Java 11 or higher (required to run Dropwizard 3).
 3. The New Relic Java agent must be enabled using the `-javaagent` command-line parameter.
 4. You must be using at least version 5.6.0 of the Java Agent.
 
