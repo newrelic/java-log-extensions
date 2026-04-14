@@ -22,9 +22,8 @@ configurations["compileOnly"].extendsFrom(includeInJar)
 
 dependencies {
     implementation("io.dropwizard:dropwizard-logging:3.0.0")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.5")
     implementation("io.dropwizard:dropwizard-request-logging:3.0.0")
-    implementation("javax.servlet:javax.servlet-api:3.1.0")
+    implementation("jakarta.servlet:jakarta.servlet-api:4.0.4")
 
     implementation("com.newrelic.agent.java:newrelic-api:9.1.0")
     includeInJar(project(":logback")) {
