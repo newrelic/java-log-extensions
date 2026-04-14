@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.github.spotbugs").version("4.4.4")
+    id("com.github.spotbugs").version("4.8.0")
 }
 
 group = "com.newrelic.logging"
