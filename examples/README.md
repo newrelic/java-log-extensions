@@ -19,6 +19,11 @@ You must follow some initial steps:
 Run the application with `./gradlew :examples:dropwizard-app:start`. Some early log messages include transactions.
 The decorated log messages will be written to `examples/dropwizard-app/logs/my-app.log`. See [test.yml](dropwizard-app/test.yml) for the configuration.
 
+### Dropwizard 3
+
+Run the application with `./gradlew :examples:dropwizard3-app:start`. Some early log messages include transactions.
+The decorated log messages will be written to `examples/dropwizard-app/logs/my-app.log`. See [test.yml](dropwizard-app/test.yml) for the configuration.
+
 ### `java.util.logging`
 
 Run the application with `./gradlew :examples:jul-app:run`. When the application completes, 

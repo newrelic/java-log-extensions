@@ -1,0 +1,3 @@
+com.newrelic.logging.dropwizard3.access.NewRelicAccessJsonLayoutFactory
+com.newrelic.logging.dropwizard3.NewRelicJsonLayoutFactory
+com.newrelic.logging.dropwizard3.LogFormatLayoutFactory

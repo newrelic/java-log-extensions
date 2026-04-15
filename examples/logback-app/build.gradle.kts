@@ -20,12 +20,12 @@ dependencies {
 }
 
 
-configure<JavaPluginConvention> {
+java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 application {
-    mainClassName = "com.newrelic.testapps.logback.Main"
+    mainClass.set("com.newrelic.testapps.logback.Main")
     applicationDefaultJvmArgs += listOf("-javaagent:${rootProject.projectDir}/lib/newrelic.jar")
 }

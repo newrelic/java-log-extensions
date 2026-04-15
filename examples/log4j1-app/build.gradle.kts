@@ -19,13 +19,13 @@ dependencies {
 }
 
 
-configure<JavaPluginConvention> {
+java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 application {
-    mainClassName = "com.newrelic.testapps.log4j1.Main"
+    mainClass.set("com.newrelic.testapps.log4j1.Main")
     applicationDefaultJvmArgs += listOf(
             "-javaagent:${rootProject.projectDir}/lib/newrelic.jar"
     )

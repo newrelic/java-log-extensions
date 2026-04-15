@@ -26,7 +26,7 @@ configure<JavaPluginConvention> {
 }
 
 application {
-    mainClassName = "PerformanceMain"
+    mainClass.set("PerformanceMain")
     applicationDefaultJvmArgs += listOf(
             "-javaagent:${rootProject.projectDir}/lib/newrelic.jar",
             "-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
@@ -34,21 +34,21 @@ application {
 }
 
 task("executeNoAgent", JavaExec::class) {
-    main = "PerformanceMain"
+    mainClass.set("PerformanceMain")
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "No_Agent")
     jvmArgs("-Xmx1024m")
 }
 
 task("executeWithAgent", JavaExec::class) {
-    main = "PerformanceMain"
+    mainClass.set("PerformanceMain")
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "With_Agent")
     jvmArgs("-Xmx1024m", "-javaagent:${rootProject.projectDir}/lib/newrelic.jar")
 }
 
 task("executeNoAgentAsync", JavaExec::class) {
-    main = "PerformanceMain"
+    mainClass.set("PerformanceMain")
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "No_Agent_Async")
     jvmArgs("-Xmx1024m")
@@ -56,7 +56,7 @@ task("executeNoAgentAsync", JavaExec::class) {
 }
 
 task("executeWithAgentAsync", JavaExec::class) {
-    main = "PerformanceMain"
+    mainClass.set("PerformanceMain")
     classpath = sourceSets["main"].runtimeClasspath
     args = listOf("INFO", "With_Agent_Async")
     jvmArgs("-Xmx1024m", "-javaagent:${rootProject.projectDir}/lib/newrelic.jar")
