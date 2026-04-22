@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import com.newrelic.api.agent.Agent;
 import com.newrelic.logging.core.LogAsserts;
-import com.newrelic.logging.logback.NewRelicAsyncAppender;
+import com.newrelic.logging.logback13.NewRelicAsyncAppender;
 import io.dropwizard.logging.common.AbstractOutputStreamAppenderFactory;
 import io.dropwizard.logging.common.async.AsyncLoggingEventAppenderFactory;
 import io.dropwizard.logging.common.filter.NullLevelFilterFactory;
@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.BufferedReader;
@@ -52,6 +53,7 @@ class NewRelicAppenderFactoryTest {
     @SuppressWarnings("WeakerAccess")
     @TempDir
     Path tempDir;
+    private LoggerContext context;
     private AsyncAppender appender;
     private LoggingEvent event;
     private AbstractOutputStreamAppenderFactory<ILoggingEvent> appenderFactory;
@@ -206,6 +208,7 @@ class NewRelicAppenderFactoryTest {
         event = new LoggingEvent();
         event.setMessage("test_error_message");
         event.setLevel(Level.ERROR);
+        event.setLoggerContext(context);
     }
 
     private void givenALoggingEventWithMDCEnabled() {
@@ -238,8 +241,6 @@ class NewRelicAppenderFactoryTest {
     }
 
     private void givenARedirectedAppender() {
-        LoggerContext context = new LoggerContext();
-
         Appender<ILoggingEvent> baseAppender = appenderFactory.build(
                 context,
                 "app name",
@@ -311,6 +312,10 @@ class NewRelicAppenderFactoryTest {
         outputStream = new PipedOutputStream();
         PipedInputStream inputStream = new PipedInputStream(outputStream);
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+
+        //Set up a new logger context
+        context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        context.reset();
     }
 
     @AfterEach

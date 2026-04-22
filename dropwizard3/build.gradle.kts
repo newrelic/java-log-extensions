@@ -26,7 +26,7 @@ dependencies {
     implementation("jakarta.servlet:jakarta.servlet-api:4.0.4")
 
     implementation("com.newrelic.agent.java:newrelic-api:9.1.0")
-    includeInJar(project(":logback")) {
+    includeInJar(project(":logback13")) {
         isTransitive = false
     }
 
@@ -34,7 +34,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:3.4.4")
     testImplementation("org.mockito:mockito-junit-jupiter:3.4.4")
     testImplementation("org.hamcrest:hamcrest:2.2")
-    testImplementation(project(":logback"))
+    testImplementation(project(":logback13"))
     testImplementation(project(":core-test"))
 }
 
