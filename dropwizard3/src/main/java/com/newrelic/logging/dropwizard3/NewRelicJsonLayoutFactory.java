@@ -8,7 +8,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.LayoutBase;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.newrelic.logging.logback.NewRelicJsonLayout;
+import com.newrelic.logging.logback13.NewRelicJsonLayout;
 import io.dropwizard.logging.common.layout.DiscoverableLayoutFactory;
 
 import java.util.TimeZone;

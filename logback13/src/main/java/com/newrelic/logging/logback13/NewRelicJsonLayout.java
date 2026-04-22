@@ -17,6 +17,7 @@ import ch.qos.logback.core.status.WarnStatus;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.newrelic.logging.core.ElementName;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.newrelic.logging.core.LogExtensionConfig;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.helpers.NOPMDCAdapter;
@@ -25,6 +26,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
+
+import static com.newrelic.logging.logback13.NewRelicAsyncAppender.NEW_RELIC_PREFIX;
 
 /**
  * A custom layout that formats {@link ILoggingEvent} log events as JSON objects.
@@ -74,12 +77,18 @@ public class NewRelicJsonLayout extends LayoutBase<ILoggingEvent> {
             String value;
 
             for (Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
-                if (entry.getValue() == null) {
+                if (entry.getValue() == null || entry.getValue().isEmpty()) {
                     continue;
                 }
                 key = entry.getKey();
                 value = entry.getValue();
-                generator.writeStringField(key, value);
+                //Before writing to the generator, strip the temporary NR prefix.
+                //Suppress user-defined context keys unless configured to send mdc values.
+                if (key.startsWith(NEW_RELIC_PREFIX)) {
+                    generator.writeStringField(key.substring(NEW_RELIC_PREFIX.length()), value);
+                } else if (LogExtensionConfig.shouldAddMDC()) {
+                    generator.writeStringField(key, value);
+                }
             }
         }
 

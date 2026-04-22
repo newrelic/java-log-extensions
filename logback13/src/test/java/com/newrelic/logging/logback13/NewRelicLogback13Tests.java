@@ -10,9 +10,13 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.OutputStreamAppender;
+import com.google.common.collect.ImmutableMap;
+import com.newrelic.api.agent.Agent;
+import com.newrelic.logging.core.LogAsserts;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
@@ -83,17 +87,24 @@ public class NewRelicLogback13Tests {
     }
 
     @Test
-    void shouldAllWorkCorrectlyWithoutMDC() throws InterruptedException {
+    void shouldAllWorkCorrectlyWithoutMDC() throws Exception {
+        //pump the agent data in - it should still be present in the wrapped event even if MDC is not used by the caller.
+        givenMockAgentData();
+
         logger.info("Very interesting test message, no MDC");
         Thread.sleep(100);
         String output = getLogOutput();
 
+        //the log message itself should be there...
         assertTrue(output.contains("Very interesting test message, no MDC"));
         assertFalse(output.contains(CONTEXT_PREFIX));
+        //...and so should the agent metadata.
+        assertOutputContainsAgentData(output);
     }
 
     @Test
-    void shouldAppendCallerDataToJsonCorrectly() throws InterruptedException {
+    void shouldAppendCallerDataToJsonCorrectly() throws Exception {
+        givenMockAgentData();
         appender.setIncludeCallerData(true);
         logger.info("Test message with Caller Data");
 
@@ -104,10 +115,13 @@ public class NewRelicLogback13Tests {
         assertTrue(output.contains("method.name"));
         assertTrue(output.contains("line.number"));
         assertTrue(output.contains("Test message with Caller Data"));
+        assertOutputContainsAgentData(output);
     }
 
     @Test
-    void shouldAppendMDCArgsToJsonWhenEnabled() throws InterruptedException {
+    void shouldAppendMDCArgsToJsonWhenEnabled() throws Exception {
+        System.setProperty("newrelic.log_extension.add_mdc", "true");
+        givenMockAgentData();
         MDC.put("userId", "user-123");
         MDC.put("sessionId", "session-456");
 
@@ -118,11 +132,13 @@ public class NewRelicLogback13Tests {
         assertTrue(output.contains("\"context.userId\":\"user-123\""));
         assertTrue(output.contains("\"context.sessionId\":\"session-456\""));
         assertTrue(output.contains("Logging with MDC enabled"));
+        assertOutputContainsAgentData(output);
     }
 
     @Test
-    void shouldNotAppendMDCArgsToJsonWhenMDCIsDisabled() throws InterruptedException {
-        NewRelicAsyncAppender.isNoOpMDC = true;
+    void shouldNotAppendMDCArgsToJsonWhenMDCIsDisabled() throws Exception {
+        System.setProperty("newrelic.log_extension.add_mdc", "false");
+        givenMockAgentData();
         MDC.put("userId", "user-123");
         MDC.clear();
 
@@ -132,7 +148,7 @@ public class NewRelicLogback13Tests {
 
         assertTrue(output.contains("Logging with MDC disabled"));
         assertFalse(output.contains("\"context.userId\":\"user-123\""));
-        assertFalse(output.contains("NewRelic:"));
+        assertOutputContainsAgentData(output);
     }
 
     @Test
@@ -231,7 +247,19 @@ public class NewRelicLogback13Tests {
     }
 
     private String getLogOutput() {
-        return outputStream.toString().trim();
+        return outputStream.toString().trim() + "\n";
     }
 
+    private void givenMockAgentData() {
+        Agent mockAgent = Mockito.mock(Agent.class);
+        Mockito.when(mockAgent.getLinkingMetadata()).thenReturn(ImmutableMap.of("some.key", "some.value", "other.key", "other.value"));
+        NewRelicAsyncAppender.agentSupplier = () -> mockAgent;
+    }
+
+    private void assertOutputContainsAgentData(String output) throws IOException{
+        LogAsserts.assertFieldValues(output, ImmutableMap.of(
+                "some.key", "some.value",
+                "other.key", "other.value"
+        ));
+    }
 }
