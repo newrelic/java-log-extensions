@@ -13,7 +13,8 @@ import javax.ws.rs.PathParam;
 public class Hello {
     @GET
     public String sayHello(@PathParam("name") String name) {
-        return "Hello, " + name + "!";
+        String safe = name.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+        return "Hello, " + safe + "!";
     }
 
     @POST
